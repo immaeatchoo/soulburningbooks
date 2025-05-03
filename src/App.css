@@ -1,0 +1,1235 @@
+.book-grid {
+  zoom:0.8;
+}
+.review-covers-button.small-button {
+  font-size: 1rem;
+  padding: 0.5rem 1.2rem;
+  max-width: none;
+}
+
+/* ===========================
+   Modal Content Styles
+   =========================== */
+ .modal-content {
+   background: url('/soul.jpg') no-repeat center center;
+   background-size: cover;
+   border: 8px solid var(--parchment);
+   border-radius: 16px;
+   padding: 3rem;
+   box-shadow: 0 0 40px var(--golden-glow);
+   width: 100%;
+   max-width: 480px;
+   position: relative;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: flex-start;
+   overflow: hidden;
+   backdrop-filter: none;
+   margin-top: 5rem; /* Increase from 1rem to create space for the X button */
+   max-height: 65vh; /* Reduced height to make modal more proportional */
+ }
+/* ===========================
+   🌹 Gothic Rose Palette - Perfectly Matches the Dark Fantasy Library 🌹
+   =========================== */
+/* ===========================
+   🌑 Mystical Enchanted Library Palette
+   =========================== */
+  :root {
+    --obsidian-black: #0e0e0e;        /* Deep black, true base */
+    --ash-smoke: #5a5a5a;             /* Muted warm gray */
+    --iron-gray: #2e2e2e;             /* Dark gray for contrast areas */
+    --burnt-ember: #a84632;           /* Muted ember red */
+    --molten-copper: #c97443;         /* Faded fire orange */
+    --soot-brown: #3a2f2f;            /* Charred brown-gray */
+    --golden-glow: #d6ae60;           /* Subtle gold shimmer */
+    --parchment: #d6c5aa;             /* Old book paper */
+    --phantom-violet: #4e3a4c;         /* Deep gothic purple for accents */
+    --ember-glow: #a84632;            /* Slightly less used than before */
+    --title-color: #b9a3e3;           /* Title color for "Page Turning & Soul Burning" and highlight */
+    --parchment-glow: rgba(244, 233, 216, 0.8); /* Parchment color with transparency for borders */
+    --purple-glow: rgba(153, 102, 204, 0.5);    /* Subtle purple glow for book cards */
+  }
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+/* ===========================
+   Font Face Declaration
+   =========================== */
+/* This is where we declare our custom font, Godfeem, so it can be used throughout the app */
+@font-face {
+  font-family: 'Godfeem';
+  src: url('/Godfeem-G1zg.ttf') format('truetype'); /* Make sure the filename matches exactly! */
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'CormorantUpright';
+  src: url('/CormorantUpright.ttf') format('truetype'); /* Make sure the filename matches exactly! */
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Anacondas';
+  src: url('/Anacondas.ttf') format('truetype'); /* Make sure the filename matches exactly! */
+  font-weight: normal;
+  font-style: normal;
+}
+
+.page-banner h1,
+.page-banner-text,
+.page-burning-title {
+  font-family: 'Godfeem', cursive;
+  font-size: 5rem;
+  letter-spacing: 0.1rem;
+  color: #f1e6d0; /* warm parchment-like beige */
+  text-shadow: 0 0 6px #a84632, 0 0 12px #c97443;
+  animation: glow 3s ease-in-out infinite alternate;
+}
+   /* =========================== */
+/* Book Card Inline Editing Styles */
+.book-card input[type="text"],
+.book-card select,
+.book-card input[type="number"],
+.book-card input[type="date"] {
+  background-color: var(--parchment);
+  color: var(--ash-smoke);
+  border: 1px solid var(--iron-gray);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  font-size: 1rem;
+  box-shadow: 0 0 10px var(--iron-gray);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Make .book-card select dropdown responsive during editing */
+.book-card select {
+  max-width: 100%;
+  width: 100%;
+}
+
+/* Book Card Inline Editing Focus Styles */
+.book-card input[type="text"]:focus,
+.book-card select:focus,
+.book-card input[type="number"]:focus,
+.book-card input[type="date"]:focus {
+  border-color: var(--golden-glow);
+  box-shadow: 0 0 12px var(--golden-glow);
+  outline: none;
+}
+
+/* ===========================
+   Editable Field Styles
+   =========================== */
+.editable-field {
+  display: flex;
+  align-items: center;
+  padding: 0.3rem 0.5rem;
+  background: var(--parchment);
+  border-radius: 8px;
+  margin: 0.2rem 0;
+  transition: box-shadow 0.2s, border 0.2s, background 0.2s;
+}
+
+.editable-field:focus {
+  border: 1.5px solid var(--golden-glow);
+  box-shadow: 0 0 10px 2px var(--golden-glow);
+  background: var(--parchment);
+}
+
+.editable-field:hover {
+  background: var(--parchment);
+  border-radius: 6px;
+}
+/* 🛑 Section: Killing Default Browser Bullshit 🛑 */
+/* Browsers love to throw ugly arrows on number fields. Not today, Satan. */
+input[type="number"]::-webkit-outer-spin-button, 
+input[type="number"]::-webkit-inner-spin-button { 
+  -webkit-appearance: none; /* Rip those ugly number arrows off */
+  margin: 0; /* No extra sneaky margins messing up my fields */
+}
+
+/* Firefox being a little different, gotta slap it too */
+input[type="number"] { 
+  appearance: textfield; /* Make it look normal like text, no spinners */
+  -moz-appearance: textfield; /* Firefox, don’t act up either */
+}
+/* 🛑 Section: Global Reset for No White Gaps 🛑 */
+html, body {
+  width: 100%;          /* Stretch to the full width of the browser */
+  margin: 0;             /* kill default page margins */
+  padding: 0;            /* kill default page padding */
+  overflow-x: hidden;    /* no sneaky horizontal scroll */
+}
+/* 🛑 Section: App Background and Main Layout - The Big Momma Wrapper 🛑 */
+/* This wraps literally the entire fucking site and gives the background */
+.app-wrapper {
+  background: transparent;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 2rem;
+  position: relative; /* important to layer background correctly */
+}
+
+
+/* 🛑 Section: Vignette Magic - Fancy Fading Edge Darkness 🛑 */
+/* Makes the edges look darker and fancy like an old storybook */
+.app-wrapper::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 60%, var(--obsidian-black) 100%);
+  z-index: 0;
+}
+
+/* 🛑 Section: App Container - Main Content Organizer 🛑 */
+/* This holds my page content like "Page Turning & Soul Burning" and the Add button */
+.app-container {
+  position: relative;
+  z-index: 1;
+  font-family: 'CormorantUpright', serif;
+  background: transparent;
+  color: #b9a3e3;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  width: 100%;
+  max-width: none;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: none;
+  border-radius: 12px;
+  text-shadow: 1px 1px 2px var(--obsidian-black);
+}
+
+*/
+/* 🛑 Section: Modal Backdrop - Darkens The Whole Page Behind Popup 🛑 */
+/* This is that sexy dark background that shows up when you open the Add Book modal */
+.modal-backdrop {
+  position: fixed; /* Stick to the viewport — follow the screen */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--obsidian-black);
+  background: linear-gradient(0deg, var(--obsidian-black) 80%, transparent 100%);
+  opacity: 0.88;
+  display: flex; /* Flex again because duh */
+  justify-content: center; /* Center the Add Book modal horizontally */
+  align-items: center; /* Center the Add Book modal vertically */
+  z-index: 1000; /* On top of all regular content but under the actual pop-up */
+}
+
+.modal-backdrop.active-blur {
+  backdrop-filter: blur(8px);
+  background: var(--obsidian-black);
+  opacity: 0.93;
+}
+
+.app-wrapper.blur {
+  filter: blur(6px);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* 🛑 Section: Modal Content (the Add Book pop-up itself) 🛑 */
+/* Handles the background, size, shadow, and vibes of the Add New Book popup */
+/* ===========================
+   Modal Content Styles
+   =========================== */
+/* (see above for .modal-content, unified to use margin-top: 3rem) */
+
+
+
+/* 🛑 Section: The "X" Button That Yeets You Out 🛑 */
+/* The little X in the corner to close the modal like 'bye bitch' */
+.close-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 24px;
+  height: 24px;
+  font-size: 1.2rem;
+  background: var(--golden-glow);
+  color: var(--iron-gray);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 5px rgba(0,0,0,0.4);
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s, color 0.3s;
+}
+
+.close-button:hover {
+  background: var(--obsidian-black);
+  color: #ffffff;
+  transform: rotate(90deg);
+}
+
+/* 🛑 Section: The Actual Add Book Form 🛑 */
+/* This is the guts inside the modal — the text fields, drop downs, etc. */
+.add-book-form {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: 100%;
+  color: var(--parchment);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+}
+
+/* 🛑 Section: Form Rows (Title/Author etc) 🛑 */
+/* Groups like Title+Author or Series+Number+Date side by side */
+.form-row {
+  display: flex; /* Arrange inputs in a row */
+  flex-wrap: wrap; /* Let them wrap onto new lines if needed (mobile friendly) */
+  justify-content: space-between; /* Evenly spread the inputs out */
+  gap: 0.3rem; /* Tighter gap between each input */
+  margin-bottom: 0.3rem; /* Less space between rows */
+}
+
+/* 🛑 Section: Forcing Flexbox to Behave in Form Rows 🛑 */
+/* Forces no wrapping on certain fields for clean layouts */
+.add-book-form .form-row {
+  display: flex !important; /* Because sometimes browsers get lazy */
+  flex-wrap: nowrap !important; /* Don't wrap onto new lines */
+  justify-content: space-between !important; /* Space things nicely */
+  align-items: center; /* Center inputs vertically */
+  gap: 0.3rem;
+  margin-bottom: 0.3rem;
+}
+
+/* 🛑 Section: Title and Author Row 🛑 */
+/* Title input and Author input chilling side-by-side */
+.add-book-form .title-author-row {
+  display: flex; /* Line them up horizontally */
+  gap: 0.5rem; /* Tiny gap between title and author fields */
+  margin-bottom: 0.5rem; /* Space under this row */
+}
+
+/* 🛑 Section: Series, Book #, Date Read Row 🛑 */
+/* The second row in the form (dropdown, number input, date) */
+.add-book-form .series-number-date-row {
+  display: flex; /* Horizontal lineup again */
+  gap: 0.5rem; /* Keep a nice gap between them */
+  margin-top: 0.5rem; /* Space above this row */
+}
+
+.add-book-form input,
+.add-book-form select {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--iron-gray);
+  background-color: var(--parchment);
+  color: var(--obsidian-black);
+  font-size: 0.9rem;
+  box-shadow: 0 0 10px var(--iron-gray);
+  transition: border-color 0.3s, box-shadow 0.3s;
+  width: 100%;
+  max-width: 300px;
+  height: 1.5rem;
+}
+
+/* 🛑 Section: Title and Author Boxes - Sharing is Caring 🛑 */
+.add-book-form .title-author-row input {
+  flex: 1 1 48% !important;
+  min-width: 100px;
+  height: 1.25rem;
+  box-shadow: 0 2px 4px var(--obsidian-black);
+}
+
+/* 🛑 Section: Series Dropdown Styling 🛑 */
+.add-book-form .series-number-date-row select {
+  flex: 1 1 40%;
+  max-width: none;
+  height: 2.2rem;
+  box-shadow: 0 0 10px var(--iron-gray);
+  background-color: var(--parchment);
+  color: var(--obsidian-black);
+  border: 1px solid var(--iron-gray);
+  border-radius: 8px;
+}
+
+/* 🛑 Section: Book Number Field - Tiny but Mighty 🛑 */
+.add-book-form .series-number-date-row input[type="number"] {
+  flex: 0 1 60px;
+  max-width: 60px;
+  height: 2rem;
+  font-size: 0.8rem;
+  text-align: center;
+  padding: 0.3rem 0.5rem;
+  box-shadow: 0 0 10px var(--iron-gray);
+}
+
+/* 🛑 Section: Date Read Field - Picking the Damn Date 🛑 */
+.add-book-form .series-number-date-row input[type="date"] {
+  flex: 1 1 40%;
+  max-width: none;
+  height: 2rem;
+  font-size: 0.9rem;
+  padding: 0.4rem 0.6rem;
+  box-shadow: 0 0 10px var(--iron-gray);
+  background-color: var(--parchment);
+  color: var(--obsidian-black);
+  border: 1px solid var(--iron-gray);
+  border-radius: 8px;
+}
+
+/* 🛑 Section: Placeholder Text Styling for Regular Inputs 🛑 */
+/* Making sure all placeholders (like Title, Author) look pretty and soft */
+.add-book-form input::placeholder,
+.add-book-form textarea::placeholder {
+  color: var(--iron-gray);
+  opacity: 0.8;
+}
+
+/* 🛑 Section: Input Focus Glow Up 🛑 */
+/* When you click into an input or dropdown, it glows like it owns the place */
+.add-book-form input:focus,
+.add-book-form select:focus {
+  border-color: var(--golden-glow);
+  outline: none;
+  box-shadow: 0 0 10px var(--golden-glow);
+}
+
+/* 🛑 Section: Textarea Special Styling 🛑 */
+/* If we ever have a textarea (bigger text box), make it comfy to type in */
+.add-book-form textarea {
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: 1px solid var(--iron-gray);
+  background-color: var(--parchment);
+  color: var(--iron-gray);
+}
+
+/* 🛑 Section: Add Book Button (Submit Button) 🛑 */
+/* The main button you click to slap a new book into the collection */
+.add-book-form button {
+  background-color: var(--iron-gray);
+  border: 1.5px solid var(--parchment);
+  color: var(--golden-glow);
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-shadow: none;
+  transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+}
+
+/* Button row for AddBook modal (Review Covers + Add Book) */
+.button-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.add-book-form button:hover {
+  background-color: var(--iron-gray);
+  color: var(--parchment);
+  box-shadow: 0 0 12px var(--soot-brown);
+}
+
+/* 🛑 Section: New Series Input Field - Let’s Name That Bitch 🛑 */
+/* Styles the text box that appears when you're adding a brand new series */
+/* 🛑 Section: New Series Input Field - Let’s Name That Bitch 🛑 */
+.add-book-form .new-series-input {
+  flex: 1 1 100%;
+  max-width: none;
+  height: 2rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  border: 1px solid var(--iron-gray);
+  background-color: var(--parchment);
+  color: var(--obsidian-black);
+  box-shadow: 0 0 10px var(--iron-gray);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.add-book-form .new-series-input:focus {
+  border-color: var(--golden-glow);
+  box-shadow: 0 0 12px var(--golden-glow);
+  outline: none;
+}
+
+/* Pagination style for page nav buttons above book grid */
+/* ===========================
+   Pagination Container Styles (No Outer Box)
+   =========================== */
+.match-detail-border {
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+/* Pagination container - remove glowing border/highlight from container itself */
+.pagination {
+  margin: 1rem 0 0 0;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 8px;
+  border: none;
+  /* box-shadow removed to eliminate glow from container */
+  font-family: 'CormorantUpright', serif;
+}
+
+.book-grid + .pagination {
+  margin-top: 0.2rem;
+}
+
+/* ===========================
+   Pagination Number Styles
+   =========================== */
+.page-button,
+.pagination button,
+.page-number {
+  font-family: 'CormorantUpright', serif;
+  font-size: 0.9rem;
+  font-weight: bold;
+  background-color: rgba(var(--primary-accent-rgb), 0.85);
+  color: #b9a3e3;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--parchment);
+  box-shadow: 0 0 10px 4px rgba(255, 199, 115, 0.6);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  animation: glow 3s ease-in-out infinite alternate;
+  text-shadow: 2px 2px 6px var(--burnt-ember), 0 0 10px var(--golden-glow);
+  margin: 0 4px;
+  z-index: 1;
+  position: relative;
+}
+
+.page-button:hover,
+.pagination button:hover,
+.page-number:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background-color: var(--hover-glow);
+}
+
+.page-button.active,
+.pagination button.active,
+.page-number.active {
+  background-color: #1a1a1a;
+  color: #d8b4fe;
+  border: 1px solid var(--parchment);
+  box-shadow: 0 0 14px var(--ember-glow), 0 0 6px var(--parchment-glow);
+}
+
+/* 🛑 Section: Book Grid - Book Parade Runway 🛑 */
+/* Styles the entire grid that holds all the books you add */
+/* 🛑 Section: Book Grid - Book Parade Runway 🛑 */
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem 0;
+  width: 100%;
+  max-width: 1200px;
+  margin: 6rem auto 0.5rem auto;
+  box-sizing: border-box;
+  justify-content: center;
+  padding: 0;
+  margin-bottom: 0;
+  animation: fadeInCard 0.8s ease-in-out;
+}
+
+/* 🛑 Section: Book Card - Each Book's Cute Little Box 🛑 */
+.book-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  border: 1px solid var(--parchment); /* parchment solid */
+  border-radius: 10px;
+  padding: 1rem;
+  padding-bottom: 4rem;
+  margin: 0.5rem;
+  width: 260px;
+  height: 480px;
+  background: linear-gradient(180deg, var(--ash-smoke) 0%, var(--obsidian-black) 100%);
+  color: var(--parchment);
+  /* Glowing fire theme */
+  box-shadow: 0 0 18px var(--ember-glow), 0 0 10px var(--parchment-glow);
+  text-shadow: none;
+  overflow: hidden;
+}
+
+/* 🛑 Section: Book Cover Image 🛑 */
+.book-card img {
+  width: 100%; /* Full width of card */
+  height: 180px; /* Fixed height for all covers (uniform and hot) */
+  object-fit: contain; /* Contain pics fully, no weird stretching or cropping */
+  border-radius: 8px; /* Soft corners to match the card */
+  margin-bottom: 0.5rem; /* Space under the pic */
+}
+
+/* 🛑 Section: Book Title 🛑 */
+/* Book Title - matches page title's parchment-glow ember vibe */
+.book-card h2 {
+  margin: 0 0 0rem;
+  font-size: 2rem;
+  font-family: 'Godfeem';
+  color: #f1e6d0; /* warm parchment-like beige */
+  text-align: center;
+  line-height: 1;
+  letter-spacing: .1rem;
+  word-break: break-word;
+  hyphens: auto;
+  text-shadow: 0 0 6px #a84632, 0 0 12px #c97443;
+  animation: glow 3s ease-in-out infinite alternate;
+}
+
+.book-card h2:hover {
+  color: var(--burnt-ember);
+  text-shadow: 0 0 4px var(--burnt-ember), 0 0 6px var(--burnt-ember);
+}
+
+/* 🛑 Section: Book Author & Extra Text 🛑 */
+
+/* Author Name (separate font) */
+.book-card .author-name {
+  margin: 0 0;
+  font-size: 1.2rem;
+  font-family: 'CormorantUpright', serif;
+  color: var(--title-color);
+  margin-bottom: 0.5rem;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+}
+
+/* Book series info (series name and book number) can be styled here if needed */
+.card-content .series-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.3rem;
+  font-style: italic;
+  color: var(--burnt-ember);
+  font-size: 1.2rem;
+  margin: 0.2rem 0.4;
+}
+
+/* Generic Paragraphs (summaries, etc.) */
+.book-card p {
+  margin: 0.2rem 0;
+  font-size: 1.1rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  color: var(--parchment);
+}
+
+.book-card .date-read {
+  font-size: 1.1rem;
+  margin: 0.5rem 0 .5rem;
+  color: var(--parchment);
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+}
+
+
+/* 🛑 Section: Card Action Buttons (Edit & Trash) 🛑 */
+.card-actions {
+  display: flex; /* Line up the icons side-by-side */
+  justify-content: center; /* Centered horizontally */
+  align-items: center; /* Center vertically */
+  gap: 0.5rem; /* Tiny gap between edit and trash */
+  width: 100%; /* Stretch full width */
+  position: absolute; /* Float over card bottom */
+  bottom: 0; /* Stick right at the bottom edge */
+  left: 50%; /* Start at horizontal middle */
+  transform: translateX(-50%); /* Shift left half width for true centering */
+  padding-bottom: 0.5rem; /* A little breathing room at bottom */
+}
+
+/* 🛑 Section: Card Content Stack 🛑 */
+.card-content {
+  display: flex; /* Vertical stack */
+  flex-direction: column; /* Stack kids top-to-bottom */
+  align-items: center; /* Center horizontally */
+  justify-content: flex-start; /* Start stacking from the top */
+  flex-grow: 1; /* Fill up space inside the card */
+  overflow: hidden; /* No ugly overflow happening */
+  padding: 0.5rem 0; /* Top-bottom padding, none on sides */
+}
+
+
+/* 🛑 Section: Star Rating - Let Them Sparkle 🛑 */
+.star-rating {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+button.star {
+  font-size: 2rem;
+  color: var(--ash-smoke);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+}
+
+button.star.selected {
+  color: var(--golden-glow);
+  background: none;
+  border-radius: 0;
+}
+
+.star-icon {
+  color: inherit;
+}
+
+button.star:hover {
+  transform: scale(1.2);
+  color: var(--burnt-ember);
+  text-shadow: 0 0 8px var(--burnt-ember);
+}
+
+.rating {
+  margin-top: auto;
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+/* 🛑 Section: Glitter Animation For Stars 🛑 */
+/* Animation magic for when stars need to SPARKLE dammit */
+@keyframes starGlitter {
+  0% { background-position: 0 0; } /* Start glitter pattern at top left */
+  100% { background-position: 10px 10px; } /* Move glitter pattern diagonally down */
+}
+
+@keyframes glow {
+  0% {
+    text-shadow: 0 0 8px var(--golden-glow), 0 0 16px var(--burnt-ember);
+  }
+  100% {
+    text-shadow: 0 0 12px var(--burnt-ember), 0 0 20px var(--golden-glow);
+  }
+}
+
+@keyframes fadeInCard {
+  0% {
+    opacity: 0;
+    transform: scale(1); /* Ensure it starts at the correct size */
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1); /* End at the correct size */
+  }
+}
+
+.background-image {
+  background-image: url('/newbg.webp');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -3;
+}
+.remove-cover-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: var(--obsidian-black);
+  color: var(--parchment);
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  transition: background 0.3s ease;
+}
+
+.remove-cover-button:hover {
+  background: var(--iron-gray);
+}
+
+/* ===========================
+   Cover Upload Styles
+   =========================== */
+.cover-upload {
+  position: relative;
+  border: 2px dashed var(--burnt-ember);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Adjust cover upload area specifically during editing */
+.cover-upload.edit-mode {
+  height: 150px;
+  width: 100%;
+  background-color: rgba(214, 197, 170, 0.9); /* Slightly darker background for better contrast */
+  color: var(--obsidian-black); /* Ensure text is bold and clear */
+  background-size: contain;
+  background-position: center center;
+  border-radius: 8px;
+  font-weight: bold; /* Make the text stand out */
+}
+
+.cover-upload::after {
+  content: 'Drag & drop a cover image here';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(214, 197, 170, 0.85); /* Adjusted background for better contrast */
+  color: var(--obsidian-black); /* Ensure text is bold and clear */
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: 'CormorantUpright', serif;
+  pointer-events: none;
+  text-align: center;
+}
+
+
+
+.book-card {
+  animation: fadeInCard 0.8s ease-in-out;
+}
+.book-title {
+  font-family: 'Godfeem', cursive;
+  color: #fef3e2;
+  font-size: 1.2rem;
+  margin: 0.25rem 0;     /* smaller top/bottom margin */
+  line-height: 1.1;      /* tighter spacing between lines */
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.6), 0 0 6px rgba(255, 255, 255, 0.2);
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;       /* floats above page content */
+  pointer-events: none; /* clicks pass through except on the backdrop */
+}
+
+/* Make the backdrop inside accept clicks and dim the background */
+.modal-overlay .modal-backdrop {
+  pointer-events: all;
+}
+@media (max-width: 600px) {
+  .book-title { font-size: 1.1rem; }
+}
+/* ===========================
+   Add New Book Button Styling
+   =========================== */
+.open-modal-button {
+  font-family: 'CormorantUpright', serif;
+  font-size: 1.2rem;
+  font-weight: bold;
+  background-color: var(--iron-gray);
+  color: #b9a3e3;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  border: 2px solid #ff764d;
+  box-shadow: 0 0 14px var(--burnt-ember), 0 0 6px var(--parchment-glow);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  animation: glow 3s ease-in-out infinite alternate;
+  text-shadow: 2px 2px 6px var(--burnt-ember), 0 0 10px var(--golden-glow);
+}
+.open-modal-button:hover {
+  background-color: #1a1a1a;
+  color: #d8b4fe;
+  border-color: #ff764d;
+  box-shadow: none;
+}
+.main-nav {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: var(--iron-gray);
+  opacity: 0.92;
+  display: flex;
+  justify-content: center;
+  z-index: 1001;
+  padding: 0.5rem 0;
+  backdrop-filter: blur(4px);
+  border-bottom: 1px solid var(--phantom-violet);
+}
+
+.main-nav ul {
+  list-style: none;
+  display: flex;
+  gap: 2.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+.main-nav li {
+  font-family: 'Godfeem', cursive;
+  font-size: 2rem;
+  color: #b9a3e3; /* soft gothic violet */
+  cursor: pointer;
+  transition: color 0.3s, text-shadow 0.3s;
+}
+
+.main-nav li:hover {
+  color: #b9a3e3; /* stay same deep violet */
+  text-shadow: 0 0 4px var(--burnt-ember), 0 0 6px var(--burnt-ember);
+}
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  padding: 4rem 2rem;
+  justify-content: center;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-preview {
+  background: var(--iron-gray);
+  opacity: 0.92;
+  border: 2px solid var(--phantom-violet);
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 0 20px var(--obsidian-black);
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+}
+
+.page-preview:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 30px var(--phantom-violet);
+}
+
+.page-preview img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.page-preview h2 {
+  font-family: 'Godfeem', cursive;
+  color: var(--parchment);
+  font-size: 2.2rem;
+  text-shadow: 1px 1px 5px rgba(0,0,0,0.7);
+}
+.book-suggestions {
+  background: var(--obsidian-black);
+  color: var(--parchment);
+  border: 1px solid var(--iron-gray);
+  max-height: 200px;
+  overflow-y: auto;
+  border-radius: 8px;
+  position: absolute;
+  z-index: 1002;
+  width: 100%;
+}
+
+.book-suggestions li {
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.book-suggestions li:hover {
+  background: var(--phantom-violet);
+  color: var(--obsidian-black);
+}
+
+/* Styles for the series dropdown inside the book card */
+.book-card select.series-dropdown {
+  height: 2.2rem;
+  font-size: 1rem;
+  padding: 0.3rem;
+  background-color: var(--parchment);
+  color: var(--obsidian-black);
+  border-radius: 8px;
+  border: 1px solid var(--iron-gray);
+  box-shadow: 0 0 8px var(--iron-gray);
+}
+
+/* Styles for the book number input inside the book card */
+.book-card input.book-number-input {
+  width: 50px;
+  text-align: center;
+  font-size: 0.9rem;
+  height: 2rem;
+  padding: 0.3rem;
+  border: 1px solid var(--iron-gray);
+  border-radius: 8px;
+  background-color: var(--parchment);
+  color: var(--obsidian-black);
+  box-shadow: 0 0 8px var(--iron-gray);
+}
+
+.gothic-spinner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 10, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.gothic-spinner-content {
+  color: #c0c0c0;
+  font-size: 1.8rem;
+  font-family: 'Cinzel', serif; /* Fancy gothic font if you want */
+  text-shadow: 0 0 10px #666;
+  animation: pulse 1.5s infinite alternate;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.gothic-spinner-content::before {
+  content: "🕯️";
+  display: inline-block;
+  margin-right: 0.5rem;
+  font-size: 2rem;
+  animation: candleFlicker 1s infinite alternate ease-in-out;
+}
+
+@keyframes pulse {
+  from { opacity: 0.7; }
+  to { opacity: 1; }
+}
+
+@keyframes candleFlicker {
+  0% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.05) rotate(-2deg);
+    filter: brightness(1.2);
+  }
+  100% {
+    transform: scale(0.97) rotate(2deg);
+    filter: brightness(0.9);
+  }
+}
+/* ===========================
+   Cover Review Screen Styles
+   =========================== */
+.cover-review-wrapper {
+  min-height: 100vh;
+  background-color: var(--obsidian-black);
+  color: var(--parchment);
+  padding: 2rem;
+  text-align: center;
+  font-family: 'CormorantUpright', serif;
+}
+
+.cover-review-wrapper h1,
+.cover-review-wrapper h2,
+.cover-review-wrapper h3,
+.cover-review-wrapper p,
+.cover-review-wrapper span,
+.cover-review-wrapper label,
+.cover-review-wrapper .subtitle,
+.cover-review-wrapper .section-label {
+  color: var(--parchment) !important;
+}
+
+.cover-review-card {
+  background-color: var(--iron-gray);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 0 20px var(--golden-glow);
+  max-width: 800px;
+  margin: 2rem auto;
+  border: 2px solid var(--phantom-violet);
+}
+
+.cover-review-card h2 {
+  font-family: 'Godfeem', cursive;
+  font-size: 2rem;
+  color: var(--parchment);
+  margin-bottom: 1rem;
+  text-shadow: 1px 1px 3px var(--obsidian-black);
+}
+
+.current-cover img,
+.cover-thumbnails img {
+  max-width: 120px;
+  height: auto;
+  margin: 0.5rem;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.cover-thumbnails {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.thumbnail:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px var(--phantom-violet);
+  cursor: pointer;
+}
+
+.cover-review-buttons {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.cover-review-buttons button {
+  background-color: var(--obsidian-black);
+  border: 2px solid var(--golden-glow);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: var(--parchment);
+  cursor: pointer;
+  font-family: 'CormorantUpright', serif;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.cover-review-buttons button:hover {
+  background-color: var(--phantom-violet);
+  box-shadow: 0 0 10px var(--phantom-violet);
+  color: var(--obsidian-black);
+}
+
+.no-cover-placeholder {
+  width: 120px;
+  height: 180px;
+  background-color: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-style: italic;
+  color: #aaa;
+  font-size: 1rem;
+}
+/* ===========================
+   Smart Search Dropdown Styles
+   =========================== */
+.smart-search-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--obsidian-black);
+  border: 1px solid var(--phantom-violet);
+  z-index: 2000;
+  max-height: 250px;
+  overflow-y: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px var(--phantom-violet);
+}
+
+/* Ensure title-author-row doesn't clip dropdown */
+.title-author-row {
+  position: relative;
+  overflow: visible;
+}
+
+/* Ensure .form-row doesn't restrict overflow */
+.form-row {
+  overflow: visible;
+}
+
+
+
+.match-detail-border {
+  border: 1px solid rgba(255, 100, 80, 0.5);
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 10px rgba(255, 100, 80, 0.4);
+  color: #fff;
+  padding: 10px 16px;
+  transition: all 0.3s ease;
+}
+
+.match-detail-border:hover {
+  box-shadow: 0 0 15px rgba(255, 100, 80, 0.6);
+  cursor: pointer;
+}
+
+button.star {
+  background: none !important;
+}
+
+.add-book-form .series-number-date-row select {
+  font-size: 0.85rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.review-covers-button {
+  font-family: 'CormorantUpright', serif;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color: transparent;
+  color: var(--title-color);
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  border: 2px solid var(--parchment);
+  box-shadow: 0 0 14px var(--burnt-ember), 0 0 6px var(--parchment-glow);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  margin-top: 0.3rem;
+  /* margin-bottom removed for button row alignment */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+.review-covers-button:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: var(--golden-glow);
+  box-shadow: 0 0 12px var(--phantom-violet);
+}
