@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 
 // 🦸‍♂️ Auth helpers (Supabase)
 import { useSession } from '@supabase/auth-helpers-react';
-import { supabase } from './supabaseClient';
 
 // 🛣️ Routing wizardry so we can have multiple pages like a real app
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
@@ -117,23 +116,14 @@ function App() {
 
   // --------------------------
   // 🕵️‍♀️ fetchBooks: Go beg the backend for the latest book list and update our state.
-  const fetchBooks = useCallback(async () => {
+  const fetchBooks = useCallback(() => {
     if (!user) {
       setBooks([]);
       return;
     }
-
-    const { data: sessionData } = await supabase.auth.getSession();
-    const accessToken = sessionData?.session?.access_token;
-
-    if (!accessToken) {
-      console.error("No access token found!");
-      return;
-    }
-
     fetch(`${BASE_URL}/api/books`, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${session?.access_token}`,
       },
     })
       .then((res) => {
@@ -162,7 +152,7 @@ function App() {
         console.error("Failed to fetch books:", err);
         setBooks([]);
       });
-  }, [BASE_URL, user]);
+  }, [BASE_URL, user, session]);
 
   // --------------------------
   // 🔥 FETCH ALL BOOKS RIGHT WHEN PAGE LOADS
