@@ -455,6 +455,7 @@ function App() {
     if (newBook.series === '__new') {
       finalBook.series = newSeriesName.trim();
     }
+    // Both PATCH and POST requests already include user_id and Authorization header.
     if (editId) {
       fetch(`${BASE_URL}/api/books/${editId}`, {
         method: 'PATCH',
