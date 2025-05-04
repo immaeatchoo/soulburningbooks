@@ -36,66 +36,68 @@ function LoginModal({ isOpen, onClose }) {
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="login-modal">
-  <button className="close-btn" onClick={onClose}>❌</button>
+    <div className="login-modal-overlay">
+      <div className="login-modal-backdrop" onClick={onClose}>
+        <div className="login-modal-content" onClick={(e) => e.stopPropagation()}>
+          <button className="login-close-btn" onClick={onClose}>❌</button>
 
-  {/* 🔥 Logo Goes Here */}
-  <img src="/ptsb_logo.jpg" alt="Page Turning & Soul Burning" className="login-logo" />
+          {/* 🔥 Logo Goes Here */}
+          <img src="/ptsb_logo.jpg" alt="Page Turning & Soul Burning" className="login-logo" />
 
-  <h2>🔐 {isSignUp ? 'Create Account' : 'Login'}</h2>
-        <form onSubmit={handleLogin} className="login-form">
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-          />
-          {isSignUp && (
-            <>
-              <input
-                type="text"
-                placeholder="First Name"
-                value={firstName}
-                onChange={e => setFirstName(e.target.value)}
-                required
-              />
-              <input
-                type="text"
-                placeholder="Last Name"
-                value={lastName}
-                onChange={e => setLastName(e.target.value)}
-                required
-              />
-            </>
-          )}
-          <div className="login-actions">
-            {!isSignUp ? (
+          <h2>🔐 {isSignUp ? 'Create Account' : 'Login'}</h2>
+          <form onSubmit={handleLogin} className="login-form">
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+            />
+            {isSignUp && (
               <>
-                <button type="submit">🚪 Sign In</button>
-                <button type="button" onClick={() => setIsSignUp(true)}>🆕 Create Account</button>
-              </>
-            ) : (
-              <>
-                <button type="button" onClick={handleSignup}>✨ Sign Up</button>
-                <button type="button" onClick={() => setIsSignUp(false)}>🔙 Back to Login</button>
+                <input
+                  type="text"
+                  placeholder="First Name"
+                  value={firstName}
+                  onChange={e => setFirstName(e.target.value)}
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Last Name"
+                  value={lastName}
+                  onChange={e => setLastName(e.target.value)}
+                  required
+                />
               </>
             )}
+            <div className="login-actions">
+              {!isSignUp ? (
+                <>
+                  <button type="submit">🚪 Sign In</button>
+                  <button type="button" onClick={() => setIsSignUp(true)}>🆕 Create Account</button>
+                </>
+              ) : (
+                <>
+                  <button type="button" onClick={handleSignup}>✨ Sign Up</button>
+                  <button type="button" onClick={() => setIsSignUp(false)}>🔙 Back to Login</button>
+                </>
+              )}
+            </div>
+            {error && <p className="login-error-msg">{error}</p>}
+          </form>
+          <p className="contact-help">Having trouble? <a href="mailto:soulburningbooks@gmail.com">Contact us</a></p>
           </div>
-          {error && <p className="error-msg">{error}</p>}
-        </form>
-        <p className="contact-help">Having trouble? <a href="mailto:soulburningbooks@gmail.com">Contact us</a></p>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
 export default LoginModal;

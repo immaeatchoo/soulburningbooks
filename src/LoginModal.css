@@ -1,4 +1,4 @@
-.modal-overlay {
+.login-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -11,15 +11,27 @@
     z-index: 999;
 }
 
+/* full-screen wrapper for centering the modal and catching background clicks */
+.login-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 998;
+}
+
 .login-modal-content {
     background: rgba(0, 0, 0, 0.85); /* Slightly darker background for the modal */
     font-family: 'CormorantUpright', serif;
     border: 2px solid #663399;
     border-radius: 12px;
     padding: 2rem;
-    width: 100%;
-    max-width: 600px; /* Increased width */
-    min-height: 400px; /* Increased height */
+    /* responsive width and height constraints */
+    width: 90%;
+    max-width: 600px;
+    min-width: 320px;
+    max-height: 80vh;
     color: #eee;
     text-shadow: 1px 1px 2px black;
     box-shadow: 0 0 60px #663399aa;
@@ -73,7 +85,7 @@
     background: #7a3fc2;
 }
 
-.close-btn {
+.login-close-btn {
     position: absolute;
     top: 8px;
     right: 12px;
@@ -84,7 +96,7 @@
     cursor: pointer;
 }
 
-.error-msg {
+.login-error-msg {
     color: #ff5555;
     margin-top: 0.5rem;
     font-size: 0.9rem;
