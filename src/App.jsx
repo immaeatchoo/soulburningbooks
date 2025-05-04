@@ -23,6 +23,7 @@ import AddBook from './AddBook';
 
 // 🎨 Styles that make things not look like 1998
 import './App.css';
+import './LoginModal.css';
 
 // --------------------------
 // 🏁 The Main App Function — Kristina-style: wrap everything in a big chunky function
