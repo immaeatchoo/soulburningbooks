@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 
 // 🦸‍♂️ Auth helpers (Supabase)
 import { useSession } from '@supabase/auth-helpers-react';
+import { supabase } from './supabaseClient';
 
 // 🛣️ Routing wizardry so we can have multiple pages like a real app
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
@@ -116,14 +117,23 @@ function App() {
 
   // --------------------------
   // 🕵️‍♀️ fetchBooks: Go beg the backend for the latest book list and update our state.
-  const fetchBooks = useCallback(() => {
+  const fetchBooks = useCallback(async () => {
     if (!user) {
       setBooks([]);
       return;
     }
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData?.session?.access_token;
+
+    if (!accessToken) {
+      console.error("No access token found!");
+      return;
+    }
+
     fetch(`${BASE_URL}/api/books`, {
       headers: {
-        Authorization: `Bearer ${session?.access_token}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     })
       .then((res) => {
@@ -152,7 +162,7 @@ function App() {
         console.error("Failed to fetch books:", err);
         setBooks([]);
       });
-  }, [BASE_URL, user, session]);
+  }, [BASE_URL, user]);
 
   // --------------------------
   // 🔥 FETCH ALL BOOKS RIGHT WHEN PAGE LOADS
@@ -215,21 +225,32 @@ function App() {
       console.log(`📚 Found ${readBooks.length} books to import.`);
       for (const book of readBooks) {
         console.log("📘 Importing:", book.title);
+        let data;
         try {
           console.log("🔎 Fetching Google Books cover for:", book.title, "by", book.author);
           const response = await fetch(`${BASE_URL}/api/smartsearch?q=intitle:${encodeURIComponent(book.title)}+inauthor:${encodeURIComponent(book.author)}`);
-          const data = await response.json();
-          if (data.items?.length) {
-            const info = data.items[0].volumeInfo;
-            if (info.imageLinks?.thumbnail) {
-              book.cover = info.imageLinks.thumbnail;
-              book.cover_google = info.imageLinks.thumbnail;
-              // Ensure both cover and cover_google are set for downstream use
-              console.log("✅ Cover fetched for:", book.title);
-            }
-          }
+          data = await response.json();
         } catch (err) {
-          console.warn("❌ Cover fetch failed for:", book.title, err);
+          console.warn("🧨 Backend smartsearch failed, falling back to Google Books API", err);
+        }
+
+        if (!data?.items?.length) {
+          try {
+            const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(book.title)}+inauthor:${encodeURIComponent(book.author)}`);
+            data = await response.json();
+          } catch (err) {
+            console.warn("❌ Google Books API also failed", err);
+          }
+        }
+
+        if (data?.items?.length) {
+          const info = data.items[0].volumeInfo;
+          if (info.imageLinks?.thumbnail) {
+            book.cover = info.imageLinks.thumbnail;
+            book.cover_google = info.imageLinks.thumbnail;
+            // Ensure both cover and cover_google are set for downstream use
+            console.log("✅ Cover fetched for:", book.title);
+          }
         }
         if (book.series && !seriesOptions.includes(book.series)) {
           setSeriesOptions(prev => [...new Set([...prev, book.series])]);
@@ -299,35 +320,58 @@ function App() {
     }
     setIsFetchingCovers(true);
     if (!book.cover) {
+      let data;
       try {
         const response = await fetch(`${BASE_URL}/api/smartsearch?q=intitle:${encodeURIComponent(book.title)}+inauthor:${encodeURIComponent(book.author)}`);
-        const data = await response.json();
-        if (data.items?.length) {
-          const first = data.items[0].volumeInfo;
-          if (first.imageLinks?.thumbnail) {
-            book.cover = first.imageLinks.thumbnail;
-            book.cover_google = first.imageLinks.thumbnail;
-            try {
-              await fetch(`${BASE_URL}/api/books/${book.id}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ cover: book.cover })
-              });
-            } catch (err) {
-              console.warn("⚠️ Failed to save cover to backend:", book.title, err);
-            }
+        data = await response.json();
+      } catch (err) {
+        console.warn("🧨 Backend smartsearch failed, falling back to Google Books API", err);
+      }
+      if (!data?.items?.length) {
+        try {
+          const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(book.title)}+inauthor:${encodeURIComponent(book.author)}`);
+          data = await response.json();
+        } catch (err) {
+          console.warn("❌ Google Books API also failed", err);
+        }
+      }
+      if (data?.items?.length) {
+        const first = data.items[0].volumeInfo;
+        if (first.imageLinks?.thumbnail) {
+          book.cover = first.imageLinks.thumbnail;
+          book.cover_google = first.imageLinks.thumbnail;
+          try {
+            await fetch(`${BASE_URL}/api/books/${book.id}`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ cover: book.cover })
+            });
+          } catch (err) {
+            console.warn("⚠️ Failed to save cover to backend:", book.title, err);
           }
         }
-      } catch (err) {
-        console.warn("❌ Cover fetch failed for:", book.title, err);
       }
     }
     // Helper to collect unique covers (max 6)
     const tryFetch = async (query) => {
-      const response = await fetch(`${BASE_URL}/api/smartsearch?q=${query}`);
-      const data = await response.json();
-      const covers = [];
-      if (data.items?.length) {
+      let data;
+      let covers = [];
+      try {
+        const response = await fetch(`${BASE_URL}/api/smartsearch?q=${query}`);
+        data = await response.json();
+      } catch (err) {
+        console.warn("🧨 Backend smartsearch failed, falling back to Google Books API", err);
+      }
+      if (!data?.items?.length) {
+        try {
+          const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${query}`);
+          data = await response.json();
+        } catch (err) {
+          console.warn("❌ Google Books API also failed", err);
+          return covers;
+        }
+      }
+      if (data?.items?.length) {
         data.items.forEach(item => {
           if (item.volumeInfo?.imageLinks?.thumbnail) {
             const thumb = item.volumeInfo.imageLinks.thumbnail;
