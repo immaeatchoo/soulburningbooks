@@ -262,9 +262,12 @@ function AddBook({
                 const formData = new FormData();
                 formData.append('file', file);
                 fetch(`${import.meta.env.VITE_API_BASE_URL}/api/upload_cover`, {
-  method: 'POST',
-  body: formData
-})
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${sessionStorage.getItem('sb-access-token')}`
+                  },
+                  body: formData
+                })
                   .then((res) => res.json())
                   .then(({ cover_url }) => {
                     setNewBook((prev) => ({ ...prev, cover: cover_url }));
@@ -340,4 +343,3 @@ function AddBook({
 export default AddBook;
 
 // <== END OF FILE ==>
-

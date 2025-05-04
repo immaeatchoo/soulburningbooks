@@ -39,23 +39,22 @@ function BookDetail({ books, onBookUpdate }) {
         if (quote === '') setQuote(bookData.quote ?? '');
 
         if (!bookData.page_count) {
-          fetch(`https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(bookData.title)}+inauthor:${encodeURIComponent(bookData.author)}`)
+          fetch(`${import.meta.env.VITE_API_BASE_URL}/smartsearch?q=${encodeURIComponent(bookData.title + ' ' + bookData.author)}`)
             .then(res => res.json())
-            .then(data => {
-              const match = data.items?.[0]?.volumeInfo;
-              if (match?.pageCount) {
-                setPageCount(match.pageCount);
+            .then(result => {
+              if (result?.pageCount) {
+                setPageCount(result.pageCount);
                 fetch(`${import.meta.env.VITE_API_BASE_URL}/books/${bookData.id}`, {
                   method: 'PATCH',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ page_count: match.pageCount })
+                  body: JSON.stringify({ page_count: result.pageCount })
                 })
                 .then(res => res.json())
-                .then(updated => console.log('✅ Page count updated from API:', updated))
+                .then(updated => console.log('✅ Page count updated from backend smart search:', updated))
                 .catch(err => console.error('❌ Failed to update page count in backend:', err));
               }
             })
-            .catch(err => console.error('📕 Failed to fetch page count from Google Books API:', err));
+            .catch(err => console.error('❌ Smart search fetch failed:', err));
         }
       }
     }

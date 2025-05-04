@@ -2,6 +2,9 @@
 // 🔌 React core stuff — gotta have this to use hooks like useState/useEffect
 import React, { useState, useEffect, useCallback } from 'react';
 
+// 🦸‍♂️ Auth helpers (Supabase)
+import { useSession } from '@supabase/auth-helpers-react';
+
 // 🛣️ Routing wizardry so we can have multiple pages like a real app
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import ScrollToTop from './ScrollToTop';
@@ -13,7 +16,7 @@ import YearlyWrapUpPage from './YearlyWrapUpPage';
 import DnfPage from './DnfPage';
 import BookDetail from './BookDetail';
 import SeriesPage from "./SeriesPage"; // or adjust path if it's in a subfolder
-
+import Login from './Login';
 
 // 📚 Add Book component — modular masterpiece now living in its own file
 import AddBook from './AddBook';
@@ -25,7 +28,13 @@ import './App.css';
 // 🏁 The Main App Function — Kristina-style: wrap everything in a big chunky function
 // --------------------------
 function App() {
+  // Login Modal state
+  const [showLoginModal, setShowLoginModal] = useState(false);
   // --------------------------
+
+  // Auth session/user
+  const session = useSession();
+  const user = session?.user;
 
   // Handler to update a book in the books state
   const handleBookUpdate = (updatedBook) => {
@@ -107,7 +116,11 @@ function App() {
   // --------------------------
   // 🕵️‍♀️ fetchBooks: Go beg the backend for the latest book list and update our state.
   const fetchBooks = useCallback(() => {
-    fetch(`${BASE_URL}/api/books`)
+    if (!user) {
+      setBooks([]);
+      return;
+    }
+    fetch(`${BASE_URL}/api/books?user_id=${user.id}`)
       .then((res) => res.json())
       .then((data) => {
         setBooks(data || []);
@@ -119,7 +132,7 @@ function App() {
         setOriginalSeriesOptions(Array.from(seriesSet));
       })
       .catch((err) => console.error("Failed to fetch books:", err));
-  }, [BASE_URL]);
+  }, [BASE_URL, user]);
 
   // --------------------------
   // 🔥 FETCH ALL BOOKS RIGHT WHEN PAGE LOADS
@@ -184,7 +197,7 @@ function App() {
         console.log("📘 Importing:", book.title);
         try {
           console.log("🔎 Fetching Google Books cover for:", book.title, "by", book.author);
-          const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(book.title)}+inauthor:${encodeURIComponent(book.author)}&key=AIzaSyAWskBlyae-TvXh_TnMKwOOQNNtMYxNdyQ`);
+          const response = await fetch(`${BASE_URL}/api/smartsearch?q=intitle:${encodeURIComponent(book.title)}+inauthor:${encodeURIComponent(book.author)}`);
           const data = await response.json();
           if (data.items?.length) {
             const info = data.items[0].volumeInfo;
@@ -205,13 +218,17 @@ function App() {
         try {
           const response = await fetch(`${BASE_URL}/api/books`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+  'Content-Type': 'application/json',
+  'Authorization': `Bearer ${session?.access_token}`
+},
             body: JSON.stringify({
               ...book,
               series: book.series || 'Standalone',
               book_number: book.book_number || '',
               cover: book.cover || '',
-              cover_google: book.cover_google || ''
+              cover_google: book.cover_google || '',
+              user_id: user?.id,
             }),
           });
           if (response.ok) {
@@ -263,7 +280,7 @@ function App() {
     setIsFetchingCovers(true);
     if (!book.cover) {
       try {
-        const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(book.title)}+inauthor:${encodeURIComponent(book.author)}&key=AIzaSyAWskBlyae-TvXh_TnMKwOOQNNtMYxNdyQ`);
+        const response = await fetch(`${BASE_URL}/api/smartsearch?q=intitle:${encodeURIComponent(book.title)}+inauthor:${encodeURIComponent(book.author)}`);
         const data = await response.json();
         if (data.items?.length) {
           const first = data.items[0].volumeInfo;
@@ -287,7 +304,7 @@ function App() {
     }
     // Helper to collect unique covers (max 6)
     const tryFetch = async (query) => {
-      const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${query}&key=AIzaSyAWskBlyae-TvXh_TnMKwOOQNNtMYxNdyQ`);
+      const response = await fetch(`${BASE_URL}/api/smartsearch?q=${query}`);
       const data = await response.json();
       const covers = [];
       if (data.items?.length) {
@@ -358,7 +375,10 @@ function App() {
     if (book.id && (book.cover || book.cover_google)) {
       await fetch(`${BASE_URL}/api/books/${book.id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+  'Content-Type': 'application/json',
+  'Authorization': `Bearer ${session?.access_token}`
+},
         body: JSON.stringify({ cover: book.cover || book.cover_google }),
       });
     }
@@ -417,7 +437,7 @@ function App() {
   // deleteBook: Ask the user if they're sure, then send the book to the shadow realm (delete from backend)
   const deleteBook = (id) => {
     if (window.confirm("Are you sure you want to send this book into the abyss 🔥?")) {
-      fetch(`${BASE_URL}/api/books/${id}`, { method: 'DELETE' })
+      fetch(`${BASE_URL}/api/books/${id}?user_id=${user?.id}`, { method: 'DELETE' })
         .then(() => fetchBooks());
     }
   };
@@ -437,8 +457,11 @@ function App() {
     if (editId) {
       fetch(`${BASE_URL}/api/books/${editId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(finalBook),
+        headers: {
+  'Content-Type': 'application/json',
+  'Authorization': `Bearer ${session?.access_token}`
+},
+        body: JSON.stringify({ ...finalBook, user_id: user?.id }),
       })
         .then((res) => {
           if (!res.ok) throw new Error("Failed to update book");
@@ -463,8 +486,11 @@ function App() {
     } else {
       fetch(`${BASE_URL}/api/books`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(finalBook),
+        headers: {
+  'Content-Type': 'application/json',
+  'Authorization': `Bearer ${session?.access_token}`
+},
+        body: JSON.stringify({ ...finalBook, user_id: user?.id }),
       })
         .then((res) => {
           if (!res.ok) throw new Error("Failed to add book");
@@ -533,8 +559,11 @@ function App() {
   const saveInline = () => {
     fetch(`${BASE_URL}/api/books/${editId}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(inlineEditBook),
+      headers: {
+  'Content-Type': 'application/json',
+  'Authorization': `Bearer ${session?.access_token}`
+},
+      body: JSON.stringify({ ...inlineEditBook, user_id: user?.id }),
     })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to update book");
@@ -631,6 +660,55 @@ function App() {
   // --------------------------
   // 🖥️ MAIN APP RENDER — THE BIG JUICY RETURN
   // --------------------------
+  if (!user) {
+    return (
+      <Router>
+        <div className="app-wrapper">
+          <nav className="main-nav">
+            <ul>
+            {user && (
+  <div style={{ position: 'absolute', top: '0.5rem', left: '1rem', color: '#ccc', fontSize: '0.9rem' }}>
+    Logged in as: {user.user_metadata?.full_name || user.email}
+  </div>
+)}
+              <li><button onClick={() => setShowLoginModal(true)} style={{ background: 'none', border: 'none', fontSize: '1rem', color: '#ccc', cursor: 'pointer', textDecoration: 'underline' }}>Login</button></li>
+            </ul>
+          </nav>
+          <div className="page-banner">
+            <h1 className="page-banner-text">Page Turning &amp; Soul Burning</h1>
+          </div>
+          <div className="app-container">
+            <p style={{ textAlign: 'center', marginTop: '2rem' }}>🔐 Please log in to view your books.</p>
+          </div>
+          {showLoginModal && (
+            <div className="modal-overlay">
+              <div className="modal-backdrop" onClick={() => setShowLoginModal(false)}>
+                <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '400px', padding: '2rem', textAlign: 'center' }}>
+                  <button
+                    onClick={() => setShowLoginModal(false)}
+                    style={{
+                      position: 'absolute',
+                      top: '1rem',
+                      right: '1rem',
+                      background: 'none',
+                      border: 'none',
+                      fontSize: '1.5rem',
+                      color: '#fff',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    ✖️
+                  </button>
+                  <Login />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </Router>
+    );
+  }
+
   return (
     <>
       {isImporting && (
@@ -655,6 +733,22 @@ function App() {
     <li><Link to="/bookshelf">My Bookshelf</Link></li>
     <li><Link to="/yearly-wrapup">My Yearly Wrapup</Link></li>
     <li><Link to="/dnf">DNF</Link></li>
+    {/* Login button before settings */}
+    <li>
+      <button
+        onClick={() => setShowLoginModal(true)}
+        style={{
+          background: 'none',
+          border: 'none',
+          fontSize: '1rem',
+          color: '#ccc',
+          cursor: 'pointer',
+          textDecoration: 'underline'
+        }}
+      >
+        Login
+      </button>
+    </li>
   </ul>
   <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
     <button
@@ -719,7 +813,33 @@ function App() {
                 hoverRating={hoverRating}
                 setHoverRating={setHoverRating}
               />
-              
+
+              {/* Login Modal */}
+              {showLoginModal && (
+                <div className="modal-overlay">
+                  <div className="modal-backdrop" onClick={() => setShowLoginModal(false)}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '400px', padding: '2rem', textAlign: 'center' }}>
+                      <button
+                        onClick={() => setShowLoginModal(false)}
+                        style={{
+                          position: 'absolute',
+                          top: '1rem',
+                          right: '1rem',
+                          background: 'none',
+                          border: 'none',
+                          fontSize: '1.5rem',
+                          color: '#fff',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        ✖️
+                      </button>
+                      <Login />
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Settings Modal */}
               {showSettingsModal && (
                 <div className="modal-overlay">
@@ -770,18 +890,18 @@ function App() {
                           {/* Review Covers */}
                           <button
                             onClick={() => {
-                              fetch(`${BASE_URL}/api/books/pending-review`)
-                                .then(res => res.json())
-                                .then(data => {
-                                  setPendingCoverFixes(data);
-                                  localStorage.setItem('pendingCoverFixes', JSON.stringify(data));
-                                  setReviewBatchSize(20);
-                                  setCurrentCoverSearchResults({});
-                                  setIsReviewingCovers(true);
-                                  // DO NOT call fetchNewCovers automatically here; user must click "Refetch Covers" per book
-                                })
-                                .catch((err) => console.error("Failed to fetch books needing review:", err));
-                              setShowSettingsModal(false);
+                          fetch(`${BASE_URL}/api/books/pending-review?user_id=${user?.id}`)
+                            .then(res => res.json())
+                            .then(data => {
+                              setPendingCoverFixes(data);
+                              localStorage.setItem('pendingCoverFixes', JSON.stringify(data));
+                              setReviewBatchSize(20);
+                              setCurrentCoverSearchResults({});
+                              setIsReviewingCovers(true);
+                              // DO NOT call fetchNewCovers automatically here; user must click "Refetch Covers" per book
+                            })
+                            .catch((err) => console.error("Failed to fetch books needing review:", err));
+                          setShowSettingsModal(false);
                             }}
                             style={{
                               backgroundColor: '#333',
@@ -991,7 +1111,10 @@ function App() {
 
                           fetch(`${BASE_URL}/api/series`, {
                             method: 'PATCH',
-                            headers: { 'Content-Type': 'application/json' },
+                            headers: {
+  'Content-Type': 'application/json',
+  'Authorization': `Bearer ${session?.access_token}`
+},
                             body: JSON.stringify({ updates: updatedSeriesMap })
                           })
                             .then(res => {
@@ -1444,6 +1567,7 @@ function App() {
 <Route path="/dnf" element={<DnfPage />} />
 <Route path="/book/:id" element={<BookDetail books={books} onBookUpdate={handleBookUpdate} />} />
 <Route path="/series/:seriesName" element={<SeriesPage />} />
+<Route path="/login" element={<Login />} />
 {/* 🛑 End of Other Pages */}
             </Routes>
         </div> {/* End of .app-container */}
