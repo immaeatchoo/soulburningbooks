@@ -14,19 +14,24 @@
   }
   
   .login-modal {
-    background: url('/ptsb_logo.jpg') center/cover no-repeat;
+    background: url('/ptsb_logo.jpg') center center / cover no-repeat, #1a1a1a;
     font-family: 'CormorantUpright', serif;
     border: 2px solid #663399;
     border-radius: 12px;
     padding: 2rem;
+    padding-top: 3rem;
     width: 100%;
     max-width: 400px;
+    min-height: 300px;
     color: #eee;
+    text-shadow: 1px 1px 2px black;
     box-shadow: 0 0 60px #663399aa;
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    text-align: center;
+    z-index: 1000;
   }
   
   .login-modal input {

@@ -30,7 +30,7 @@ function LoginModal({ isOpen, onClose }) {
     <div className="modal-overlay">
       <div className="login-modal">
         <button className="close-btn" onClick={onClose}>❌</button>
-        <h2>🔐 Login</h2>
+        <h2>🔐 Login or Sign Up</h2>
         <form onSubmit={handleLogin} className="login-form">
           <input
             type="email"
@@ -48,10 +48,11 @@ function LoginModal({ isOpen, onClose }) {
           />
           <div className="login-actions">
             <button type="submit">🚪 Sign In</button>
-            <button type="button" onClick={handleSignup}>✨ Sign Up</button>
+            <button type="button" onClick={handleSignup}>🆕 Create Account</button>
           </div>
           {error && <p className="error-msg">{error}</p>}
         </form>
+        <p className="contact-help">Having trouble? <a href="mailto:soulburningbooks@gmail.com">Contact us</a></p>
       </div>
     </div>
   );

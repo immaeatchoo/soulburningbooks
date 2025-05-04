@@ -668,7 +668,7 @@ function App() {
             <div className="page-banner">
               <h1 className="page-banner-text">Page Turning &amp; Soul Burning</h1>
             </div>
-            <p style={{ textAlign: 'center', marginTop: '2rem' }}>🔐 Please log in to continue.</p>
+            <p style={{ textAlign: 'center', marginTop: '2rem' }}>🔐 Please log in or create an account to continue.</p>
             <button
               onClick={() => setShowLoginModal(true)}
               style={{
