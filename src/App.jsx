@@ -690,9 +690,8 @@ function App() {
               <div className="modal-overlay">
                 <div className="modal-backdrop" onClick={() => setShowLoginModal(false)}>
                   <div
-                    className="modal-content"
+                    className="login-modal-content login-modal"
                     onClick={(e) => e.stopPropagation()}
-                    style={{ maxWidth: '400px', padding: '2rem', textAlign: 'center' }}
                   >
                     <button
                       onClick={() => setShowLoginModal(false)}
