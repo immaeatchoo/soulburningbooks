@@ -121,7 +121,7 @@ function App() {
       setBooks([]);
       return;
     }
-    fetch(`${BASE_URL}/api/books?user_id=${user.id}`, {
+    fetch(`${BASE_URL}/api/books`, {
       headers: {
         Authorization: `Bearer ${session?.access_token}`,
       },
