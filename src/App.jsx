@@ -37,6 +37,41 @@ function App() {
   const session = useSession();
   const user = session?.user;
 
+  /* List of all books we fetched from the server (empty squad at first) */
+  const [books, setBooks] = useState([]);
+
+  /* Connect to backend server via Render */
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+  // Fetch books helper function
+  const fetchBooks = useCallback(async () => {
+    if (!session) return;
+
+    const token = session.access_token;
+
+    try {
+      const response = await fetch(`${BASE_URL}/api/books`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch books, status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setBooks(data);
+    } catch (err) {
+      console.error('Failed to fetch books:', err);
+    }
+  }, [session, BASE_URL]);
+
+  // Fetch books when session or BASE_URL or fetchBooks changes
+  useEffect(() => {
+    fetchBooks();
+  }, [session, BASE_URL, fetchBooks]);
+
   // Handler to update a book in the books state
   const handleBookUpdate = (updatedBook) => {
     setBooks(prevBooks =>
@@ -50,11 +85,6 @@ function App() {
   // Kristina: These are all the major state variables for the app.
   // Book list, new book form, modals, sorting, pagination, etc.
 
-  /* List of all books we fetched from the server (empty squad at first) */
-  const [books, setBooks] = useState([]);
-
-  /* Connect to backend server via Render */
-  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   /* New book form fields (blank book ready for love) */
   const [newBook, setNewBook] = useState({
@@ -115,55 +145,6 @@ function App() {
   const [isFetchingCovers, setIsFetchingCovers] = useState(false);
 
   // --------------------------
-  // 🕵️‍♀️ fetchBooks: Go beg the backend for the latest book list and update our state.
-  const fetchBooks = useCallback(() => {
-    if (!user) {
-      setBooks([]);
-      return;
-    }
-    fetch(`${BASE_URL}/api/books`, {
-      headers: {
-        Authorization: `Bearer ${session?.access_token}`,
-      },
-    })
-      .then((res) => {
-        if (!res.ok) {
-          console.error('Failed to fetch books, status:', res.status);
-          setBooks([]);
-          return [];
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (!Array.isArray(data)) {
-          console.warn('Unexpected books data:', data);
-          setBooks([]);
-          return;
-        }
-        setBooks(data);
-        const seriesSet = new Set(['Standalone']);
-        data.forEach((book) => {
-          if (book.series) seriesSet.add(book.series);
-        });
-        setSeriesOptions(Array.from(seriesSet));
-        setOriginalSeriesOptions(Array.from(seriesSet));
-      })
-      .catch((err) => {
-        console.error("Failed to fetch books:", err);
-        setBooks([]);
-      });
-  }, [BASE_URL, user, session]);
-
-  // --------------------------
-  // 🔥 FETCH ALL BOOKS RIGHT WHEN PAGE LOADS
-  // --------------------------
-  useEffect(() => {
-    fetchBooks();
-    const savedPage = parseInt(sessionStorage.getItem('currentPage'), 10);
-    if (!isNaN(savedPage)) {
-      setCurrentPage(savedPage);
-    }
-  }, [fetchBooks]);
 
   // Import books marked as "read" from Goodreads CSV with confirmation
   const importGoodreadsCSV = async (file) => {

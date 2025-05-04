@@ -44,8 +44,12 @@ function AddBook({
           setSearchResults(cacheRef.current[newBook.title]);
           setShowDropdown(true);
         } else {
-          // First try fetching from local cache
-          fetch(`${import.meta.env.VITE_API_BASE_URL}/cached_covers?title=${encodeURIComponent(newBook.title)}`)
+          // First try fetching from local cache with authorization header
+          fetch(`${import.meta.env.VITE_API_BASE_URL}/cached_covers?title=${encodeURIComponent(newBook.title)}`, {
+            headers: {
+              'Authorization': `Bearer ${sessionStorage.getItem('sb-access-token')}`
+            }
+          })
             .then((res) => res.json())
             .then((cachedData) => {
               if (Array.isArray(cachedData) && cachedData.length > 0) {
@@ -62,8 +66,12 @@ function AddBook({
                 setSearchResults(results);
                 setShowDropdown(results.length > 0);
               } else {
-                // Fallback to live Google API
-                fetch(`${import.meta.env.VITE_API_BASE_URL}/api/smart_search?q=${encodeURIComponent(newBook.title)}`)
+                // Fallback to live Google API with authorization header
+                fetch(`${import.meta.env.VITE_API_BASE_URL}/api/smart_search?q=${encodeURIComponent(newBook.title)}`, {
+                  headers: {
+                    'Authorization': `Bearer ${sessionStorage.getItem('sb-access-token')}`
+                  }
+                })
                   .then((res) => res.json())
                   .then((data) => {
                     console.log("[SMART RAW DATA]", data);
