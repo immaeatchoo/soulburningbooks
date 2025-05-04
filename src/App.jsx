@@ -16,7 +16,7 @@ import YearlyWrapUpPage from './YearlyWrapUpPage';
 import DnfPage from './DnfPage';
 import BookDetail from './BookDetail';
 import SeriesPage from "./SeriesPage"; // or adjust path if it's in a subfolder
-import Login from './Login';
+import Login from './Login.jsx';
 
 // 📚 Add Book component — modular masterpiece now living in its own file
 import AddBook from './AddBook';
@@ -708,7 +708,7 @@ function App() {
                     >
                       ✖️
                     </button>
-                    <Login />
+                    <Login isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
                   </div>
                 </div>
               </div>
