@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
 // 🦸‍♂️ Auth helpers (Supabase)
-import { useSession } from '@supabase/auth-helpers-react';
+import { useSupabaseClient, useSessionContext } from '@supabase/auth-helpers-react';
 
 // 🛣️ Routing wizardry so we can have multiple pages like a real app
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
@@ -33,8 +33,9 @@ function App() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   // --------------------------
 
-  // Auth session/user
-  const session = useSession();
+  // Auth session/user (updated for useSessionContext)
+  const { session } = useSessionContext();
+  const supabase = useSupabaseClient();
   const user = session?.user;
 
   /* List of all books we fetched from the server (empty squad at first) */
@@ -66,6 +67,22 @@ function App() {
       console.error('Failed to fetch books:', err);
     }
   }, [session, BASE_URL]);
+
+  // Token auto-refresh effect for Supabase
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event) => {
+      if (event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN') {
+        console.log('🔄 Token refreshed or signed in.');
+        fetchBooks(); // Refresh books with new token
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [supabase, fetchBooks]);
 
   // Fetch books when session or BASE_URL or fetchBooks changes
   useEffect(() => {
