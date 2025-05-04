@@ -1,25 +1,25 @@
 .modal-overlay {
     position: fixed;
-    top: 0; left: 0;
+    top: 0;
+    left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.7); /* Slightly transparent black background */
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 999;
-  }
-  
-  .login-modal-content {
-    background: rgba(0, 0, 0, 0.75);
+}
+
+.login-modal-content {
+    background: rgba(0, 0, 0, 0.85); /* Slightly darker background for the modal */
     font-family: 'CormorantUpright', serif;
     border: 2px solid #663399;
     border-radius: 12px;
     padding: 2rem;
-    padding-top: 3rem;
     width: 100%;
-    max-width: 400px;
-    min-height: 300px;
+    max-width: 600px; /* Increased width */
+    min-height: 400px; /* Increased height */
     color: #eee;
     text-shadow: 1px 1px 2px black;
     box-shadow: 0 0 60px #663399aa;
@@ -29,22 +29,23 @@
     flex-direction: column;
     align-items: stretch;
     text-align: center;
-  }
+    overflow-y: auto; /* Allow scrolling if content overflows */
+}
 
-  .login-modal-content * {
+.login-modal-content * {
     position: relative;
     z-index: 10;
-  }
+}
 
-  .login-logo {
-    width: 250px;
+.login-logo {
+    width: 300px; /* Increased size for the logo */
     margin: 0 auto 1rem;
     display: block;
     border-radius: 10px;
     box-shadow: 0 0 20px #663399aa;
-  }
-  
-  .login-modal-content input {
+}
+
+.login-modal-content input {
     display: block;
     width: 100%;
     padding: 0.75rem;
@@ -54,9 +55,9 @@
     border: 1px solid #555;
     border-radius: 6px;
     font-size: 1rem;
-  }
-  
-  .login-modal-content button {
+}
+
+.login-modal-content button {
     margin-top: 1rem;
     width: 100%;
     padding: 0.6rem;
@@ -66,13 +67,13 @@
     border-radius: 6px;
     cursor: pointer;
     font-weight: bold;
-  }
-  
-  .login-modal-content button:hover {
+}
+
+.login-modal-content button:hover {
     background: #7a3fc2;
-  }
-  
-  .close-btn {
+}
+
+.close-btn {
     position: absolute;
     top: 8px;
     right: 12px;
@@ -81,11 +82,11 @@
     color: #fff;
     border: none;
     cursor: pointer;
-  }
-  
-  .error-msg {
+}
+
+.error-msg {
     color: #ff5555;
     margin-top: 0.5rem;
     font-size: 0.9rem;
     text-align: center;
-  }
+}
