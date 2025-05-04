@@ -121,19 +121,38 @@ function App() {
       setBooks([]);
       return;
     }
-    fetch(`${BASE_URL}/api/books?user_id=${user.id}`)
-      .then((res) => res.json())
+    fetch(`${BASE_URL}/api/books?user_id=${user.id}`, {
+      headers: {
+        Authorization: `Bearer ${session?.access_token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          console.error('Failed to fetch books, status:', res.status);
+          setBooks([]);
+          return [];
+        }
+        return res.json();
+      })
       .then((data) => {
-        setBooks(data || []);
+        if (!Array.isArray(data)) {
+          console.warn('Unexpected books data:', data);
+          setBooks([]);
+          return;
+        }
+        setBooks(data);
         const seriesSet = new Set(['Standalone']);
-        (data || []).forEach((book) => {
+        data.forEach((book) => {
           if (book.series) seriesSet.add(book.series);
         });
         setSeriesOptions(Array.from(seriesSet));
         setOriginalSeriesOptions(Array.from(seriesSet));
       })
-      .catch((err) => console.error("Failed to fetch books:", err));
-  }, [BASE_URL, user]);
+      .catch((err) => {
+        console.error("Failed to fetch books:", err);
+        setBooks([]);
+      });
+  }, [BASE_URL, user, session]);
 
   // --------------------------
   // 🔥 FETCH ALL BOOKS RIGHT WHEN PAGE LOADS
@@ -220,9 +239,9 @@ function App() {
           const response = await fetch(`${BASE_URL}/api/books`, {
             method: 'POST',
             headers: {
-  'Content-Type': 'application/json',
-  'Authorization': `Bearer ${session?.access_token}`
-},
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session?.access_token}`
+            },
             body: JSON.stringify({
               ...book,
               series: book.series || 'Standalone',
@@ -377,9 +396,9 @@ function App() {
       await fetch(`${BASE_URL}/api/books/${book.id}`, {
         method: 'PATCH',
         headers: {
-  'Content-Type': 'application/json',
-  'Authorization': `Bearer ${session?.access_token}`
-},
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
         body: JSON.stringify({ cover: book.cover || book.cover_google }),
       });
     }
@@ -459,9 +478,9 @@ function App() {
       fetch(`${BASE_URL}/api/books/${editId}`, {
         method: 'PATCH',
         headers: {
-  'Content-Type': 'application/json',
-  'Authorization': `Bearer ${session?.access_token}`
-},
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
         body: JSON.stringify({ ...finalBook, user_id: user?.id }),
       })
         .then((res) => {
@@ -488,9 +507,9 @@ function App() {
       fetch(`${BASE_URL}/api/books`, {
         method: 'POST',
         headers: {
-  'Content-Type': 'application/json',
-  'Authorization': `Bearer ${session?.access_token}`
-},
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
         body: JSON.stringify({ ...finalBook, user_id: user?.id }),
       })
         .then((res) => {
@@ -561,9 +580,9 @@ function App() {
     fetch(`${BASE_URL}/api/books/${editId}`, {
       method: 'PATCH',
       headers: {
-  'Content-Type': 'application/json',
-  'Authorization': `Bearer ${session?.access_token}`
-},
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session?.access_token}`
+      },
       body: JSON.stringify({ ...inlineEditBook, user_id: user?.id }),
     })
       .then((res) => {
@@ -687,31 +706,7 @@ function App() {
               Login
             </button>
             {showLoginModal && (
-              <div className="login-modal-overlay">
-                <div className="login-modal-backdrop" onClick={() => setShowLoginModal(false)}>
-                  <div
-                    className="login-modal-content login-modal"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <button
-                      onClick={() => setShowLoginModal(false)}
-                      style={{
-                        position: 'absolute',
-                        top: '1rem',
-                        right: '1rem',
-                        background: 'none',
-                        border: 'none',
-                        fontSize: '1.5rem',
-                        color: '#fff',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      ✖️
-                    </button>
-                    <Login isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
-                  </div>
-                </div>
-              </div>
+              <Login isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
             )}
           </div>
         </div>
@@ -743,21 +738,18 @@ function App() {
     <li><Link to="/bookshelf">My Bookshelf</Link></li>
     <li><Link to="/yearly-wrapup">My Yearly Wrapup</Link></li>
     <li><Link to="/dnf">DNF</Link></li>
-    {/* Login button before settings */}
+    {/* Always show user first name */}
     <li>
-      <button
-        onClick={() => setShowLoginModal(true)}
+      <span
         style={{
-          background: 'none',
-          border: 'none',
           fontSize: '1rem',
           color: '#ccc',
-          cursor: 'pointer',
-          textDecoration: 'underline'
+          textDecoration: 'none',
+          cursor: 'default',
         }}
       >
-        Login
-      </button>
+        {user.user_metadata?.first_name || 'User'}
+      </span>
     </li>
   </ul>
   <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
@@ -1129,9 +1121,9 @@ function App() {
                           fetch(`${BASE_URL}/api/series`, {
                             method: 'PATCH',
                             headers: {
-  'Content-Type': 'application/json',
-  'Authorization': `Bearer ${session?.access_token}`
-},
+                              'Content-Type': 'application/json',
+                              'Authorization': `Bearer ${session?.access_token}`
+                            },
                             body: JSON.stringify({ updates: updatedSeriesMap })
                           })
                             .then(res => {
@@ -1431,19 +1423,6 @@ function App() {
                               background: 'none',
                               border: '1px solid #ccc',
                               padding: '0.25rem 0.5rem',
-                              color: 'var(--glow-gold)'
-                            }}
-                          >
-                            ✅ Save
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setEditId(null)}
-                            style={{
-                              background: 'none',
-                              border: '1px solid #ccc',
-                              padding: '0.25rem 0.5rem',
-                              color: 'var(--glow-gold)'
                             }}
                           >
                             ❌ Cancel
