@@ -559,7 +559,5 @@ def get_pending_cover_books():
     ])
 
 if __name__ == "__main__":
-    # Listen on all interfaces on port 5001 to avoid conflicts
-    app.run(host="0.0.0.0", port=5001, debug=True)
-    
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5001)))
     
