@@ -1252,7 +1252,7 @@ button.star {
 
 .unauth-content {
   text-align: center;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.4); /* Lowered opacity */
   padding: 2rem;
   border-radius: 1rem;
   box-shadow: 0 0 40px rgba(255, 196, 136, 0.3);
@@ -1260,7 +1260,7 @@ button.star {
 
 .unauth-wrapper .page-banner-text {
   font-size: 2.5rem;
-  font-family: 'Cinzel Decorative', cursive;
+  font-family: 'CormorantUpright', cursive;
   color: #ffeedd;
   text-shadow: 0 0 10px #000;
 }
