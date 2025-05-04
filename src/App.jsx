@@ -1,6 +1,6 @@
 // 📦 Importing all the necessary libraries and components for our bookish adventure
 // 🔌 React core stuff — gotta have this to use hooks like useState/useEffect
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 // 🛣️ Routing wizardry so we can have multiple pages like a real app
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
@@ -42,6 +42,9 @@ function App() {
 
   /* List of all books we fetched from the server (empty squad at first) */
   const [books, setBooks] = useState([]);
+
+  /* Connect to backend server via Render */
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   /* New book form fields (blank book ready for love) */
   const [newBook, setNewBook] = useState({
@@ -102,19 +105,9 @@ function App() {
   const [isFetchingCovers, setIsFetchingCovers] = useState(false);
 
   // --------------------------
-  // 🔥 FETCH ALL BOOKS RIGHT WHEN PAGE LOADS
-  // --------------------------
-  useEffect(() => {
-    fetchBooks();
-    const savedPage = parseInt(sessionStorage.getItem('currentPage'), 10);
-    if (!isNaN(savedPage)) {
-      setCurrentPage(savedPage);
-    }
-  }, []);
-
   // 🕵️‍♀️ fetchBooks: Go beg the backend for the latest book list and update our state.
-  const fetchBooks = () => {
-    fetch('http://localhost:5001/api/books')
+  const fetchBooks = useCallback(() => {
+    fetch(`${BASE_URL}/api/books`)
       .then((res) => res.json())
       .then((data) => {
         setBooks(data || []);
@@ -126,7 +119,18 @@ function App() {
         setOriginalSeriesOptions(Array.from(seriesSet));
       })
       .catch((err) => console.error("Failed to fetch books:", err));
-  };
+  }, [BASE_URL]);
+
+  // --------------------------
+  // 🔥 FETCH ALL BOOKS RIGHT WHEN PAGE LOADS
+  // --------------------------
+  useEffect(() => {
+    fetchBooks();
+    const savedPage = parseInt(sessionStorage.getItem('currentPage'), 10);
+    if (!isNaN(savedPage)) {
+      setCurrentPage(savedPage);
+    }
+  }, [fetchBooks]);
 
   // Import books marked as "read" from Goodreads CSV with confirmation
   const importGoodreadsCSV = async (file) => {
@@ -199,7 +203,7 @@ function App() {
         }
         console.log("📤 Sending to backend:", book.title);
         try {
-          const response = await fetch('http://localhost:5001/api/books', {
+          const response = await fetch(`${BASE_URL}/api/books`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -267,7 +271,7 @@ function App() {
             book.cover = first.imageLinks.thumbnail;
             book.cover_google = first.imageLinks.thumbnail;
             try {
-              await fetch(`http://localhost:5001/books/${book.id}`, {
+              await fetch(`${BASE_URL}/books/${book.id}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ cover: book.cover })
@@ -326,7 +330,7 @@ function App() {
     removeBookFromPending(book);
 
     // Force save cover to backend
-    fetch(`http://localhost:5001/books/${book.id}`, {
+    fetch(`${BASE_URL}/books/${book.id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -349,9 +353,10 @@ function App() {
         console.error("❌ Error saving cover:", err);
       });
   };
+
   const keepCurrentCover = async (book) => {
     if (book.id && (book.cover || book.cover_google)) {
-      await fetch(`http://localhost:5001/books/${book.id}`, {
+      await fetch(`${BASE_URL}/books/${book.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cover: book.cover || book.cover_google }),
@@ -359,13 +364,16 @@ function App() {
     }
     removeBookFromPending(book);
   };
+
   const skipBook = (book) => {
     removeBookFromPending(book);
   };
+
   const refetchCovers = (book) => {
     // Only fetch when explicitly called
     fetchNewCovers(book);
   };
+
   const removeBookFromPending = (book) => {
     const bookKey = `${book.title.toLowerCase()}-${book.author.toLowerCase()}`;
     setPendingCoverFixes(prev =>
@@ -409,7 +417,7 @@ function App() {
   // deleteBook: Ask the user if they're sure, then send the book to the shadow realm (delete from backend)
   const deleteBook = (id) => {
     if (window.confirm("Are you sure you want to send this book into the abyss 🔥?")) {
-      fetch(`http://localhost:5001/books/${id}`, { method: 'DELETE' })
+      fetch(`${BASE_URL}/books/${id}`, { method: 'DELETE' })
         .then(() => fetchBooks());
     }
   };
@@ -427,7 +435,7 @@ function App() {
       finalBook.series = newSeriesName.trim();
     }
     if (editId) {
-      fetch(`http://localhost:5001/books/${editId}`, {
+      fetch(`${BASE_URL}/books/${editId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(finalBook),
@@ -453,7 +461,7 @@ function App() {
         })
         .catch((err) => console.error(err));
     } else {
-      fetch('http://localhost:5001/api/books', {
+      fetch(`${BASE_URL}/api/books`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(finalBook),
@@ -518,11 +526,12 @@ function App() {
   // Handle page change and scroll to top
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
-    document.querySelector('.app-container')?.scrollIntoView({ behavior: 'smooth' });  };
+    document.querySelector('.app-container')?.scrollIntoView({ behavior: 'smooth' }); 
+  };
 
   // saveInline: User clicked "Save" in the inline edit form, so PATCH the backend and clean up our mess
   const saveInline = () => {
-    fetch(`http://localhost:5001/books/${editId}`, {
+    fetch(`${BASE_URL}/books/${editId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(inlineEditBook),
@@ -761,7 +770,7 @@ function App() {
                           {/* Review Covers */}
                           <button
                             onClick={() => {
-                              fetch('http://localhost:5001/books/pending-review')
+                              fetch(`${BASE_URL}/books/pending-review`)
                                 .then(res => res.json())
                                 .then(data => {
                                   setPendingCoverFixes(data);
@@ -811,7 +820,7 @@ function App() {
                         <button
                           onClick={() => {
                             if (window.confirm("⚠️ Are you sure? This will delete ALL books. This action cannot be undone.")) {
-                              fetch('http://localhost:5001/api/books', { method: 'DELETE' })
+                              fetch(`${BASE_URL}/api/books`, { method: 'DELETE' })
                                 .then((res) => {
                                   if (res.ok) {
                                     setBooks([]);
@@ -980,7 +989,7 @@ function App() {
                             }
                           });
 
-                          fetch('http://localhost:5001/api/series', {
+                          fetch(`${BASE_URL}/api/series`, {
                             method: 'PATCH',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ updates: updatedSeriesMap })
@@ -1102,7 +1111,7 @@ function App() {
                             const file = e.dataTransfer.files[0];
                             const formData = new FormData();
                             formData.append('file', file);
-                            fetch('http://localhost:5001/upload_cover', { method: 'POST', body: formData })
+                            fetch(`${BASE_URL}/upload_cover`, { method: 'POST', body: formData })
                               .then((res) => res.json())
                               .then(({ cover_url }) => {
                                 setInlineEditBook((prev) => ({ ...prev, cover: cover_url }));
@@ -1334,7 +1343,7 @@ function App() {
                               book.cover
                                 ? book.cover.startsWith('http')
                                   ? book.cover
-                                  : `http://localhost:5001${book.cover}`
+                                  : `${BASE_URL}${book.cover}`
                                 : 'fallback-image.jpg'
                             }
                             alt="Cover"
