@@ -45,7 +45,7 @@ function BookDetail({ books, onBookUpdate }) {
               const match = data.items?.[0]?.volumeInfo;
               if (match?.pageCount) {
                 setPageCount(match.pageCount);
-                fetch(`http://localhost:5001/books/${bookData.id}`, {
+                fetch(`${import.meta.env.VITE_API_BASE_URL}/books/${bookData.id}`, {
                   method: 'PATCH',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ page_count: match.pageCount })
@@ -63,7 +63,7 @@ function BookDetail({ books, onBookUpdate }) {
 
 
   const handleSave = () => {
-    fetch(`http://localhost:5001/books/${bookData.id}`, {
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/books/${bookData.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -131,7 +131,7 @@ function BookDetail({ books, onBookUpdate }) {
               bookData.cover
                 ? bookData.cover.startsWith('http')
                   ? bookData.cover
-                  : `http://localhost:5001${bookData.cover}`
+                  : `${import.meta.env.VITE_API_BASE_URL}${bookData.cover}`
                 : 'fallback-image.jpg'
             }
             alt="cover"

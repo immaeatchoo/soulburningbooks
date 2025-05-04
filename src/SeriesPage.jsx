@@ -11,7 +11,7 @@ function SeriesPage() {
     console.log("🔍 Current series name:", seriesName);
     const fetchBooksInSeries = async () => {
       try {
-        const response = await axios.get(`http://localhost:5001/api/series/${encodeURIComponent(seriesName)}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/series/${encodeURIComponent(seriesName)}`);
         console.log("📚 Series data:", response.data);
         const booksArray = response.data.books || [];
 

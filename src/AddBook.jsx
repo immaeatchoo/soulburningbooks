@@ -45,7 +45,7 @@ function AddBook({
           setShowDropdown(true);
         } else {
           // First try fetching from local cache
-          fetch(`http://localhost:5001/cached_covers?title=${encodeURIComponent(newBook.title)}`)
+          fetch(`${import.meta.env.VITE_API_BASE_URL}/cached_covers?title=${encodeURIComponent(newBook.title)}`)
             .then((res) => res.json())
             .then((cachedData) => {
               if (Array.isArray(cachedData) && cachedData.length > 0) {
@@ -63,7 +63,7 @@ function AddBook({
                 setShowDropdown(results.length > 0);
               } else {
                 // Fallback to live Google API
-                fetch(`http://localhost:5001/api/smart_search?q=${encodeURIComponent(newBook.title)}`)
+                fetch(`${import.meta.env.VITE_API_BASE_URL}/api/smart_search?q=${encodeURIComponent(newBook.title)}`)
                   .then((res) => res.json())
                   .then((data) => {
                     console.log("[SMART RAW DATA]", data);
@@ -261,7 +261,10 @@ function AddBook({
                 const file = e.dataTransfer.files[0];
                 const formData = new FormData();
                 formData.append('file', file);
-                fetch('http://localhost:5001/upload_cover', { method: 'POST', body: formData })
+                fetch(`${import.meta.env.VITE_API_BASE_URL}/upload_cover`, {
+  method: 'POST',
+  body: formData
+})
                   .then((res) => res.json())
                   .then(({ cover_url }) => {
                     setNewBook((prev) => ({ ...prev, cover: cover_url }));
