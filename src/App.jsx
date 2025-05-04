@@ -663,47 +663,57 @@ function App() {
   if (!user) {
     return (
       <Router>
-        <div className="app-wrapper">
-          <nav className="main-nav">
-            <ul>
-            {user && (
-  <div style={{ position: 'absolute', top: '0.5rem', left: '1rem', color: '#ccc', fontSize: '0.9rem' }}>
-    Logged in as: {user.user_metadata?.full_name || user.email}
-  </div>
-)}
-              <li><button onClick={() => setShowLoginModal(true)} style={{ background: 'none', border: 'none', fontSize: '1rem', color: '#ccc', cursor: 'pointer', textDecoration: 'underline' }}>Login</button></li>
-            </ul>
-          </nav>
-          <div className="page-banner">
-            <h1 className="page-banner-text">Page Turning &amp; Soul Burning</h1>
-          </div>
-          <div className="app-container">
-            <p style={{ textAlign: 'center', marginTop: '2rem' }}>🔐 Please log in to view your books.</p>
-          </div>
-          {showLoginModal && (
-            <div className="modal-overlay">
-              <div className="modal-backdrop" onClick={() => setShowLoginModal(false)}>
-                <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '400px', padding: '2rem', textAlign: 'center' }}>
-                  <button
-                    onClick={() => setShowLoginModal(false)}
-                    style={{
-                      position: 'absolute',
-                      top: '1rem',
-                      right: '1rem',
-                      background: 'none',
-                      border: 'none',
-                      fontSize: '1.5rem',
-                      color: '#fff',
-                      cursor: 'pointer'
-                    }}
+        <div className="unauth-wrapper">
+          <div className="unauth-content">
+            <div className="page-banner">
+              <h1 className="page-banner-text">Page Turning &amp; Soul Burning</h1>
+            </div>
+            <p style={{ textAlign: 'center', marginTop: '2rem' }}>🔐 Please log in to continue.</p>
+            <button
+              onClick={() => setShowLoginModal(true)}
+              style={{
+                display: 'block',
+                margin: '2rem auto',
+                padding: '0.75rem 1.5rem',
+                fontSize: '1rem',
+                backgroundColor: '#333',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer'
+              }}
+            >
+              Login
+            </button>
+            {showLoginModal && (
+              <div className="modal-overlay">
+                <div className="modal-backdrop" onClick={() => setShowLoginModal(false)}>
+                  <div
+                    className="modal-content"
+                    onClick={(e) => e.stopPropagation()}
+                    style={{ maxWidth: '400px', padding: '2rem', textAlign: 'center' }}
                   >
-                    ✖️
-                  </button>
-                  <Login />
+                    <button
+                      onClick={() => setShowLoginModal(false)}
+                      style={{
+                        position: 'absolute',
+                        top: '1rem',
+                        right: '1rem',
+                        background: 'none',
+                        border: 'none',
+                        fontSize: '1.5rem',
+                        color: '#fff',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      ✖️
+                    </button>
+                    <Login />
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </Router>
     );
@@ -848,7 +858,7 @@ function App() {
                     <div
                       className="modal-content"
                       onClick={(e) => e.stopPropagation()}
-                        style={{ maxWidth: '400px', padding: '2rem', textAlign: 'center', position: 'relative' }}
+                        style={{ maxWidth: '500px', padding: '2.5rem', textAlign: 'center', position: 'relative' }}
                     >
                         <button
                           onClick={() => setShowSettingsModal(false)}
@@ -968,6 +978,10 @@ function App() {
                         >
                           🗑️ Delete ALL Books
                         </button>
+                        {/* Contact link at the bottom of the modal content */}
+                        <p style={{ marginTop: '1.5rem', fontSize: '0.9rem', color: '#ccc' }}>
+                          📬 Contact: <a href="mailto:soulburningbooks@gmail.com" style={{ color: '#ffcc99', textDecoration: 'underline' }}>soulburningbooks@gmail.com</a>
+                        </p>
                         {/* No bottom "✖ Close" button here, per instructions */}
                       </div>
                     </div>

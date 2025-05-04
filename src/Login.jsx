@@ -31,11 +31,27 @@ function LoginModal({ isOpen, onClose }) {
       <div className="login-modal">
         <button className="close-btn" onClick={onClose}>❌</button>
         <h2>🔐 Login</h2>
-        <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-        <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
-        <button onClick={handleLogin}>🚪 Sign In</button>
-        <button onClick={handleSignup}>✨ Sign Up</button>
-        {error && <p className="error-msg">{error}</p>}
+        <form onSubmit={handleLogin} className="login-form">
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            required
+          />
+          <div className="login-actions">
+            <button type="submit">🚪 Sign In</button>
+            <button type="button" onClick={handleSignup}>✨ Sign Up</button>
+          </div>
+          {error && <p className="error-msg">{error}</p>}
+        </form>
       </div>
     </div>
   );

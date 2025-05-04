@@ -1,10 +1,12 @@
-/* src/LoginModal.css */
+
+
+
 .modal-overlay {
     position: fixed;
     top: 0; left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(15, 15, 15, 0.85);
+    background: rgba(0, 0, 0, 0.85);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -12,25 +14,31 @@
   }
   
   .login-modal {
-    background: #1e1e1e;
+    background: url('/ptsb_logo.jpg') center/cover no-repeat;
+    font-family: 'CormorantUpright', serif;
     border: 2px solid #663399;
     border-radius: 12px;
     padding: 2rem;
-    width: 320px;
+    width: 100%;
+    max-width: 400px;
     color: #eee;
-    box-shadow: 0 0 20px #663399aa;
+    box-shadow: 0 0 60px #663399aa;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
   }
   
   .login-modal input {
     display: block;
     width: 100%;
-    padding: 0.5rem;
+    padding: 0.75rem;
     margin-top: 1rem;
     background: #2c2c2c;
     color: white;
-    border: 1px solid #444;
+    border: 1px solid #555;
     border-radius: 6px;
+    font-size: 1rem;
   }
   
   .login-modal button {
@@ -42,15 +50,20 @@
     border: none;
     border-radius: 6px;
     cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .login-modal button:hover {
+    background: #7a3fc2;
   }
   
   .close-btn {
     position: absolute;
     top: 8px;
     right: 12px;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     background: transparent;
-    color: white;
+    color: #fff;
     border: none;
     cursor: pointer;
   }
@@ -59,4 +72,5 @@
     color: #ff5555;
     margin-top: 0.5rem;
     font-size: 0.9rem;
+    text-align: center;
   }

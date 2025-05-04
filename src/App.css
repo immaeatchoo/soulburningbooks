@@ -1233,3 +1233,34 @@ button.star {
   color: var(--golden-glow);
   box-shadow: 0 0 12px var(--phantom-violet);
 }
+
+/* 🌑 Before-login soul background */
+.unauth-wrapper {
+  position: relative;
+  min-height: 100vh;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.85)), url('/soul.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  z-index: 0;
+}
+
+.unauth-content {
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 0 40px rgba(255, 196, 136, 0.3);
+}
+
+.unauth-wrapper .page-banner-text {
+  font-size: 2.5rem;
+  font-family: 'Cinzel Decorative', cursive;
+  color: #ffeedd;
+  text-shadow: 0 0 10px #000;
+}
