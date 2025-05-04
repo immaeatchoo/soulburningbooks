@@ -5,6 +5,9 @@ import './LoginModal.css';
 function LoginModal({ isOpen, onClose }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState('');
 
   if (!isOpen) return null;
@@ -21,7 +24,13 @@ function LoginModal({ isOpen, onClose }) {
   };
 
   const handleSignup = async () => {
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { first_name: firstName, last_name: lastName }
+      }
+    });
     if (error) setError(error.message);
     else alert('Check your inbox to confirm!');
   };
@@ -29,8 +38,12 @@ function LoginModal({ isOpen, onClose }) {
   return (
     <div className="modal-overlay">
       <div className="login-modal">
-        <button className="close-btn" onClick={onClose}>❌</button>
-        <h2>🔐 Login or Sign Up</h2>
+  <button className="close-btn" onClick={onClose}>❌</button>
+
+  {/* 🔥 Logo Goes Here */}
+  <img src="/ptsb_logo.jpg" alt="Page Turning & Soul Burning" className="login-logo" />
+
+  <h2>🔐 {isSignUp ? 'Create Account' : 'Login'}</h2>
         <form onSubmit={handleLogin} className="login-form">
           <input
             type="email"
@@ -46,9 +59,36 @@ function LoginModal({ isOpen, onClose }) {
             onChange={e => setPassword(e.target.value)}
             required
           />
+          {isSignUp && (
+            <>
+              <input
+                type="text"
+                placeholder="First Name"
+                value={firstName}
+                onChange={e => setFirstName(e.target.value)}
+                required
+              />
+              <input
+                type="text"
+                placeholder="Last Name"
+                value={lastName}
+                onChange={e => setLastName(e.target.value)}
+                required
+              />
+            </>
+          )}
           <div className="login-actions">
-            <button type="submit">🚪 Sign In</button>
-            <button type="button" onClick={handleSignup}>🆕 Create Account</button>
+            {!isSignUp ? (
+              <>
+                <button type="submit">🚪 Sign In</button>
+                <button type="button" onClick={() => setIsSignUp(true)}>🆕 Create Account</button>
+              </>
+            ) : (
+              <>
+                <button type="button" onClick={handleSignup}>✨ Sign Up</button>
+                <button type="button" onClick={() => setIsSignUp(false)}>🔙 Back to Login</button>
+              </>
+            )}
           </div>
           {error && <p className="error-msg">{error}</p>}
         </form>

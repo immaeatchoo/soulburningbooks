@@ -11,7 +11,7 @@
   }
   
   .login-modal-content {
-    background: url('/ptsb_logo.jpg') center center / cover no-repeat, #1a1a1a;
+    background: rgba(0, 0, 0, 0.75);
     font-family: 'CormorantUpright', serif;
     border: 2px solid #663399;
     border-radius: 12px;
@@ -24,11 +24,24 @@
     text-shadow: 1px 1px 2px black;
     box-shadow: 0 0 60px #663399aa;
     position: relative;
+    z-index: 10;
     display: flex;
     flex-direction: column;
     align-items: stretch;
     text-align: center;
-    z-index: 1000;
+  }
+
+  .login-modal-content * {
+    position: relative;
+    z-index: 10;
+  }
+
+  .login-logo {
+    width: 250px;
+    margin: 0 auto 1rem;
+    display: block;
+    border-radius: 10px;
+    box-shadow: 0 0 20px #663399aa;
   }
   
   .login-modal-content input {
@@ -36,7 +49,7 @@
     width: 100%;
     padding: 0.75rem;
     margin-top: 1rem;
-    background: #2c2c2c;
+    background: rgba(44, 44, 44, 0.9);
     color: white;
     border: 1px solid #555;
     border-radius: 6px;
