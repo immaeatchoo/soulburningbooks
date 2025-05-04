@@ -271,7 +271,7 @@ function App() {
             book.cover = first.imageLinks.thumbnail;
             book.cover_google = first.imageLinks.thumbnail;
             try {
-              await fetch(`${BASE_URL}/books/${book.id}`, {
+              await fetch(`${BASE_URL}/api/books/${book.id}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ cover: book.cover })
@@ -330,7 +330,7 @@ function App() {
     removeBookFromPending(book);
 
     // Force save cover to backend
-    fetch(`${BASE_URL}/books/${book.id}`, {
+    fetch(`${BASE_URL}/api/books/${book.id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -356,7 +356,7 @@ function App() {
 
   const keepCurrentCover = async (book) => {
     if (book.id && (book.cover || book.cover_google)) {
-      await fetch(`${BASE_URL}/books/${book.id}`, {
+      await fetch(`${BASE_URL}/api/books/${book.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cover: book.cover || book.cover_google }),
@@ -417,7 +417,7 @@ function App() {
   // deleteBook: Ask the user if they're sure, then send the book to the shadow realm (delete from backend)
   const deleteBook = (id) => {
     if (window.confirm("Are you sure you want to send this book into the abyss 🔥?")) {
-      fetch(`${BASE_URL}/books/${id}`, { method: 'DELETE' })
+      fetch(`${BASE_URL}/api/books/${id}`, { method: 'DELETE' })
         .then(() => fetchBooks());
     }
   };
@@ -435,7 +435,7 @@ function App() {
       finalBook.series = newSeriesName.trim();
     }
     if (editId) {
-      fetch(`${BASE_URL}/books/${editId}`, {
+      fetch(`${BASE_URL}/api/books/${editId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(finalBook),
@@ -531,7 +531,7 @@ function App() {
 
   // saveInline: User clicked "Save" in the inline edit form, so PATCH the backend and clean up our mess
   const saveInline = () => {
-    fetch(`${BASE_URL}/books/${editId}`, {
+    fetch(`${BASE_URL}/api/books/${editId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(inlineEditBook),
@@ -770,7 +770,7 @@ function App() {
                           {/* Review Covers */}
                           <button
                             onClick={() => {
-                              fetch(`${BASE_URL}/books/pending-review`)
+                              fetch(`${BASE_URL}/api/books/pending-review`)
                                 .then(res => res.json())
                                 .then(data => {
                                   setPendingCoverFixes(data);
@@ -1111,7 +1111,7 @@ function App() {
                             const file = e.dataTransfer.files[0];
                             const formData = new FormData();
                             formData.append('file', file);
-                            fetch(`${BASE_URL}/upload_cover`, { method: 'POST', body: formData })
+                            fetch(`${BASE_URL}/api/upload_cover`, { method: 'POST', body: formData })
                               .then((res) => res.json())
                               .then(({ cover_url }) => {
                                 setInlineEditBook((prev) => ({ ...prev, cover: cover_url }));

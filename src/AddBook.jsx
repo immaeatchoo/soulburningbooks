@@ -261,7 +261,7 @@ function AddBook({
                 const file = e.dataTransfer.files[0];
                 const formData = new FormData();
                 formData.append('file', file);
-                fetch(`${import.meta.env.VITE_API_BASE_URL}/upload_cover`, {
+                fetch(`${import.meta.env.VITE_API_BASE_URL}/api/upload_cover`, {
   method: 'POST',
   body: formData
 })
