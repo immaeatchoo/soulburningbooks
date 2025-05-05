@@ -48,7 +48,13 @@ function App() {
   const fetchBooks = useCallback(async () => {
     if (!session) return;
 
-    const token = session?.access_token || (await supabase.auth.getSession()).data.session?.access_token;
+    // Clean token retrieval
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    console.log("🪪 Sending Authorization token:", token);
+    console.log("📡 Fetching books with headers:", {
+      Authorization: `Bearer ${token}`,
+    });
 
     try {
       const response = await fetch(`${BASE_URL}/api/books`, {
