@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import './BookDetail.css';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useSession } from '@supabase/auth-helpers-react';
 
 function BookDetail({ books, onBookUpdate }) {
@@ -40,7 +40,7 @@ function BookDetail({ books, onBookUpdate }) {
         if (pageCount === '') setPageCount(bookData.page_count ?? '');
         if (quote === '') setQuote(bookData.quote ?? '');
 
-        if (!bookData.page_count) {
+        if (pageCount === '') {
           fetch(`${import.meta.env.VITE_API_BASE_URL}/api/smartsearch?q=${encodeURIComponent(bookData.title + ' ' + bookData.author)}`, {
             headers: {
               'Authorization': `Bearer ${session?.access_token}`
@@ -48,12 +48,13 @@ function BookDetail({ books, onBookUpdate }) {
           })
             .then(res => res.json())
             .then(result => {
-              if (result?.pageCount) {
-                setPageCount(result.pageCount);
-                fetch(`${import.meta.env.VITE_API_BASE_URL}/books/${bookData.id}`, {
+              const first = Array.isArray(result) && result.length > 0 ? result[0] : null;
+              if (first?.page_count) {
+                setPageCount(first.page_count);
+                fetch(`${import.meta.env.VITE_API_BASE_URL}/api/books/${bookData.id}`, {
                   method: 'PATCH',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ page_count: result.pageCount })
+                  body: JSON.stringify({ page_count: first.page_count })
                 })
                 .then(res => res.json())
                 .then(updated => console.log('✅ Page count updated from backend smart search:', updated))
@@ -123,8 +124,11 @@ function BookDetail({ books, onBookUpdate }) {
     </>
   );
 
-  const readingTime = Math.ceil((bookData.page_count || 0) / 50); // est. 50 pages/hour
+  // Use the user‐editable pageCount state, or fallback to bookData.page_count
+  const effectivePageCount = Number(pageCount) || bookData.page_count || 0;
+  const readingTime = Math.ceil(effectivePageCount / 50); // est. 50 pages/hour
 
+  console.log('📘 Rendering BookDetail with:', bookData, { summary, pageCount, quote });
   return (
     <>
       <button
@@ -162,7 +166,9 @@ function BookDetail({ books, onBookUpdate }) {
                 )}
                 {bookData.series.toLowerCase() !== 'standalone' && (
                   <p className="series-link">
-                    <a href={`/series/${encodeURIComponent(bookData.series)}`}>&#10148; View Series</a>
+                    <Link to={`/series/${encodeURIComponent(bookData.series)}`}>
+                      &#10148; View Series
+                    </Link>
                   </p>
                 )}
               </div>
@@ -184,29 +190,31 @@ function BookDetail({ books, onBookUpdate }) {
                   style={{ width: '80px' }}
                 />
               ) : (
-                pageCount || '??'
+                (pageCount || bookData.page_count) || '??'
               )}</p>
-              <p><strong>Rating:</strong> {'★'.repeat(bookData.rating || 0)}</p>
-              <p><strong>Est. Reading Time:</strong> {readingTime ? `${readingTime} hr${readingTime > 1 ? 's' : ''}` : '??'}</p>
-              <p><strong>Pages:</strong> {bookData.page_count != null ? bookData.page_count : 'N/A'}</p>
-              <p><strong>Summary:</strong> {bookData.summary?.length ? bookData.summary : 'No summary yet.'}</p>
-              <p><strong>Favorite Quote:</strong> {bookData.quote?.length ? `“${bookData.quote}”` : 'No favorite quote yet.'}</p>
-            </div>
-            <div className="book-quote-wrapper" style={{ marginTop: '2rem' }}>
-              <div className={`book-quote-bubble ${quote && quote.length > 130 ? 'long-quote' : ''}`}>
-                {isEditing ? (
-                  <textarea
-                    value={quote || ''}
-                    onChange={e => setQuote(e.target.value)}
-                    rows={3}
-                    className="book-quote-textarea"
-                    placeholder="Favorite Quote"
-                  />
-                ) : (
-                  <blockquote>
-                    {quote ? `“${quote}”` : <span className="quote-placeholder">Favorite Quote</span>}
-                  </blockquote>
-                )}
+              <p>
+                <strong>Est. Reading Time:</strong>{' '}
+                {readingTime > 0 ? `${readingTime} hour${readingTime > 1 ? 's' : ''}` : '??'}
+              </p>
+              <div className="book-quote-wrapper" style={{ marginTop: '2rem' }}>
+                <div className={`book-quote-bubble ${quote && quote.length > 130 ? 'long-quote' : ''}`}>
+                  {isEditing ? (
+                    <textarea
+                      value={quote || ''}
+                      onChange={e => setQuote(e.target.value)}
+                      rows={3}
+                      className="book-quote-textarea"
+                      placeholder="Favorite Quote"
+                    />
+                  ) : (
+                    <blockquote>
+                      { (quote || bookData.quote)
+                        ? `“${quote || bookData.quote}”`
+                        : <span className="quote-placeholder">Favorite Quote</span>
+                      }
+                    </blockquote>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -215,13 +223,18 @@ function BookDetail({ books, onBookUpdate }) {
           <h3>📖 Summary</h3>
           {isEditing ? (
             <textarea
-              value={summary}
+              value={summary || ''}
               onChange={e => setSummary(e.target.value)}
               rows={10}
               className="book-summary-textarea"
             />
           ) : (
-            <p>{summary || 'No summary yet. Add something juicy and dramatic.'}</p>
+            <p>
+              {(summary || bookData.summary)
+                ? (summary || bookData.summary)
+                : 'No summary yet. Add something juicy and dramatic.'
+              }
+            </p>
           )}
         </div>
         <div style={{ marginTop: '1rem' }}>

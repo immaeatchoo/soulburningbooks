@@ -4,6 +4,9 @@ import axios from 'axios';
 import './SeriesPage.css';
 import { useSession } from '@supabase/auth-helpers-react';
 
+// Use the same back-end base URL as App.jsx
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 function SeriesPage() {
   const { seriesName } = useParams();
   const [books, setBooks] = useState([]);
@@ -14,13 +17,10 @@ function SeriesPage() {
     const fetchBooksInSeries = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/api/series/${encodeURIComponent(seriesName)}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${session?.access_token}`
-            }
-          }
+          `${BASE_URL}/api/series/${encodeURIComponent(seriesName)}`,
+          { headers: { Authorization: `Bearer ${session?.access_token}` } }
         );
+        
         console.log("📚 Series data:", response.data);
         const booksArray = response.data.books || [];
 
