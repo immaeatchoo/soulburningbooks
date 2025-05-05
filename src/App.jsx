@@ -1580,14 +1580,6 @@ const deleteBook = (id) => {
                           <button
                             type="button"
                             onClick={() => deleteBook(inlineEditBook.id)}
-                            onClick={() => startEdit(book)}
-                            style={{ cursor: 'pointer', background: 'none', border: 'none' }}
-                          >
-                            ✏️
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => deleteBook(inlineEditBook.id)}
                             style={{ cursor: 'pointer', background: 'none', border: 'none' }}
                           >
                             🗑️
