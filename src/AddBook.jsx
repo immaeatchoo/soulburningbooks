@@ -15,18 +15,18 @@ import './App.css'; // Because ugly apps are a crime.
 */
 // Kristina: AddBook is now a pure modal component, stateless, with all state/handlers passed in from App.jsx.
 function AddBook({
-  showModal,
-  setShowModal,
-  newBook,
-  setNewBook,
-  newSeriesName,
-  setNewSeriesName,
-  seriesOptions,
-  handleChange,
-  handleSubmit,
-  handleStarClick,
-  setShowReviewCovers, // <-- make sure this prop is passed in!
-}) {
+    showModal,
+    setShowModal,
+    newBook,
+    setNewBook,
+    newSeriesName,
+    setNewSeriesName,
+    seriesOptions,
+    handleChange,
+    handleSubmit,
+    handleStarClick,
+    setIsReviewingCovers
+    }) {
 
   
   // --- Smart Google Books Search State ---
@@ -67,7 +67,7 @@ function AddBook({
                 setShowDropdown(results.length > 0);
               } else {
                 // Fallback to live Google API with authorization header
-                fetch(`${import.meta.env.VITE_API_BASE_URL}/api/smart_search?q=${encodeURIComponent(newBook.title)}`, {
+                fetch(`${import.meta.env.VITE_API_BASE_URL}/api/smartsearch?q=${encodeURIComponent(newBook.title)}`, {
                   headers: {
                     'Authorization': `Bearer ${sessionStorage.getItem('sb-access-token')}`
                   }
@@ -314,10 +314,8 @@ function AddBook({
                 type="button"
                 className="review-covers-button small-button"
                 onClick={() => {
-                  if (setShowReviewCovers) {
-                    setShowReviewCovers(true);
-                    setShowModal(false);
-                  }
+                  setIsReviewingCovers(true);
+                  setShowModal(false);
                 }}
               >
                 🔍 Review Covers

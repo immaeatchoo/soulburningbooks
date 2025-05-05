@@ -59,12 +59,12 @@ function SeriesPage() {
                 onClick={() => window.scrollTo(0, 0)}
               >
                 <img
-                  src={book.cover}
+                  src={book.cover_google || book.cover_local || '/fallback.png'}
                   alt={`Cover of ${book.title}`}
                   className="series-book-cover"
                 />
                 <div className="series-book-info">
-                  <span className="series-book-number">#{book.book_number}</span>
+                  <span className="series-book-number">#{book.book_number || '?'}</span>
                   <span className="series-book-title">{book.title}</span>
                 </div>
               </Link>

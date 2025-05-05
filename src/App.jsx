@@ -774,7 +774,7 @@ const deleteBook = (id) => {
     <li>
       <span
         style={{
-          fontSize: '1rem',
+          fontSize: '5rem',
           color: '#ccc',
           textDecoration: 'none',
           cursor: 'default',
@@ -846,6 +846,12 @@ const deleteBook = (id) => {
                 handleStarClick={handleStarClick}
                 hoverRating={hoverRating}
                 setHoverRating={setHoverRating}
+                BASE_URL={BASE_URL}
+                session={session}
+                user={user}
+                setPendingCoverFixes={setPendingCoverFixes}
+                setCurrentCoverSearchResults={setCurrentCoverSearchResults}
+                setIsReviewingCovers={setIsReviewingCovers}
               />
 
               {/* Login Modal */}
@@ -1480,9 +1486,29 @@ const deleteBook = (id) => {
                             type="button"
                             onClick={saveInline}
                             style={{
-                              background: 'none',
-                              border: '1px solid #ccc',
-                              padding: '0.25rem 0.5rem',
+                              background: '#4caf50',
+                              color: '#fff',
+                              border: 'none',
+                              padding: '0.4rem 0.8rem',
+                              borderRadius: '4px',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            💾 Save
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditId(null);
+                              setInlineEditBook(null);
+                            }}
+                            style={{
+                              background: '#f44336',
+                              color: '#fff',
+                              border: 'none',
+                              padding: '0.4rem 0.8rem',
+                              borderRadius: '4px',
+                              cursor: 'pointer'
                             }}
                           >
                             ❌ Cancel
@@ -1499,7 +1525,7 @@ const deleteBook = (id) => {
                           </button>
                           <button
                             type="button"
-                            onClick={() => deleteBook(book.id)}
+                            onClick={() => deleteBook(inlineEditBook.id)}
                             style={{ cursor: 'pointer', background: 'none', border: 'none' }}
                           >
                             🗑️
@@ -1519,11 +1545,19 @@ const deleteBook = (id) => {
                         >
                           <img
                             src={
-                              book.cover
-                                ? book.cover.startsWith('http')
-                                  ? book.cover
-                                  : `${BASE_URL}${book.cover}`
-                                : 'fallback-image.jpg'
+                              book.cover?.startsWith('http')
+                                ? book.cover
+                                : book.cover_google?.startsWith('http')
+                                  ? book.cover_google
+                                  : book.cover_local?.startsWith('http')
+                                    ? book.cover_local
+                                    : book.cover
+                                      ? `${BASE_URL}${book.cover}`
+                                      : book.cover_google
+                                        ? `${BASE_URL}${book.cover_google}`
+                                        : book.cover_local
+                                          ? `${BASE_URL}${book.cover_local}`
+                                          : 'fallback-image.jpg'
                             }
                             alt="Cover"
                             style={{
@@ -1560,7 +1594,7 @@ const deleteBook = (id) => {
                           <p className="author-name">{book.author}</p>
                           {/* 🔒 Date Read: Display when it was read */}
                           {/* 🔒 Series: Show series and book number if not Standalone */}
-                          {seriesOptions.includes(book.series) && book.series !== 'Standalone' && (
+                          {book.series && book.series !== 'Standalone' && (
                             <p className="series-info">
                               {book.series} {book.book_number && `(#${book.book_number})`}
                             </p>
