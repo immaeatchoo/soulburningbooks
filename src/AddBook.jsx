@@ -2,6 +2,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css'; // Because ugly apps are a crime.
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+// Helper to enforce HTTPS and proxy remote covers
+const getCoverUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('/')) return url;
+  const secure = url.startsWith('http://') ? url.replace(/^http:\/\//i, 'https://') : url;
+  return `${BASE_URL}/api/cover-proxy?url=${encodeURIComponent(secure)}`;
+};
+
 
 // --------------------------
 // 📚 STATE VARIABLES: Tracking All The Shit We Care About
@@ -165,7 +174,7 @@ function AddBook({
                       >
                         {book.thumbnail && (
                           <img
-                            src={book.thumbnail}
+                            src={getCoverUrl(book.thumbnail)}
                             alt="thumb"
                             style={{ width: '30px', height: '45px', objectFit: 'cover' }}
                           />
@@ -283,7 +292,7 @@ function AddBook({
             >
               {/* Show the cover image if available, otherwise beg for a drag-and-drop. */}
               {newBook.cover
-                ? <img src={newBook.cover} alt="Cover" style={{ maxWidth: '100%' }} />
+                ? <img src={getCoverUrl(newBook.cover)} alt="Cover" style={{ maxWidth: '100%' }} />
                 : 'Drag & drop a cover image here'}
             </div>
             {/* Star rating, because everyone loves stars. */}

@@ -6,6 +6,13 @@ import { useSession } from '@supabase/auth-helpers-react';
 
 // Use the same back-end base URL as App.jsx
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+// Helper to enforce HTTPS and proxy remote covers
+const getCoverUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('/')) return url;
+  const secure = url.startsWith('http://') ? url.replace(/^http:\/\//i, 'https://') : url;
+  return `${BASE_URL}/api/cover-proxy?url=${encodeURIComponent(secure)}`;
+};
 
 function SeriesPage() {
   const { seriesName } = useParams();
@@ -59,7 +66,7 @@ function SeriesPage() {
                 onClick={() => window.scrollTo(0, 0)}
               >
                 <img
-                  src={book.cover_google || book.cover_local || '/fallback.png'}
+                  src={getCoverUrl(book.cover_google || book.cover_local)}
                   alt={`Cover of ${book.title}`}
                   className="series-book-cover"
                 />

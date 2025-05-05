@@ -7,9 +7,9 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // Unified cover URL handling: serve local uploads directly, proxy remote covers
 function getCoverUrl(url) {
-  if (!url) return ''; // Handle empty URLs gracefully
-  if (url.startsWith('/')) return `${BASE_URL}${url}`; // Local uploads
-  const httpsUrl = url.replace(/^http:\/\//i, 'https://'); // Ensure HTTPS for remote covers
+  if (!url) return '';
+  if (url.startsWith('/')) return `${BASE_URL}${url}`;
+  const httpsUrl = url.startsWith('http://') ? url.replace('http://', 'https://') : url;
   return `${BASE_URL}/api/cover-proxy?url=${encodeURIComponent(httpsUrl)}`;
 }
 

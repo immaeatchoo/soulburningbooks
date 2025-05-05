@@ -46,6 +46,8 @@ function App() {
   // Helper for proxying book covers and enforcing HTTPS
   const getCoverUrl = (url) => {
     if (!url) return '';
+    // Always proxy remote covers, and serve local covers directly
+    if (url.startsWith('/')) return `${BASE_URL}${url}`;
     const httpsUrl = url.startsWith('http://') ? url.replace('http://', 'https://') : url;
     return `${BASE_URL}/api/cover-proxy?url=${encodeURIComponent(httpsUrl)}`;
   };
@@ -710,7 +712,7 @@ const deleteBook = (id) => {
               <div className="current-cover">
                 <h3>Current Cover</h3>
                 {(book.cover || book.cover_google) ? (
-                  <img src={book.cover ? book.cover : getCoverUrl(book.cover_google)} alt={`${book.title} cover`} />
+                  <img src={getCoverUrl(book.cover || book.cover_google || book.cover_local)} alt={`${book.title} cover`} />
                 ) : (
                   <div className="no-cover-placeholder">No cover</div>
                 )}
@@ -724,7 +726,7 @@ const deleteBook = (id) => {
                     {covers.map((url, i) => (
                       <img
                         key={i}
-                        src={url}
+                        src={getCoverUrl(url)}
                         alt="New Cover Option"
                         className="thumbnail"
                         onClick={() => selectNewCover(book, url)}
