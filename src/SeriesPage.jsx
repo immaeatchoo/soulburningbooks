@@ -8,6 +8,7 @@ function SeriesPage() {
   const { seriesName } = useParams();
   const [books, setBooks] = useState([]);
   const session = useSession();
+  
 
   useEffect(() => {
     console.log("🔍 Current series name:", seriesName);

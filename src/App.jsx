@@ -607,27 +607,77 @@ const deleteBook = (id) => {
     document.querySelector('.app-container')?.scrollIntoView({ behavior: 'smooth' }); 
   };
 
-  // saveInline: User clicked "Save" in the inline edit form, so PATCH the backend and clean up our mess
-  const saveInline = () => {
-    fetch(`${BASE_URL}/api/books/${editId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session?.access_token}`
-      },
-      body: JSON.stringify({ ...inlineEditBook, user_id: user?.id }),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to update book");
-        return res.json();
-      })
-      .then(() => {
-        fetchBooks();
-        setEditId(null);
-        setInlineEditBook(null);
-      })
-      .catch((err) => console.error(err));
+  // Update saveInline function
+  const saveInline = async () => {
+    const token = session?.access_token;
+    if (!token || !editId) return;
+
+    try {
+      const response = await fetch(`${BASE_URL}/api/books/${editId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          ...inlineEditBook,
+          user_id: user?.id
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      // Update books state with the updated book
+      setBooks(prevBooks => 
+        prevBooks.map(book => 
+          book.id === editId ? { ...book, ...result.book } : book
+        )
+      );
+
+      // Refresh series options
+      const seriesResponse = await fetch(`${BASE_URL}/series`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (seriesResponse.ok) {
+        const series = await seriesResponse.json();
+        setSeriesOptions(series);
+        setOriginalSeriesOptions(series);
+      }
+
+      setEditId(null);
+      setInlineEditBook(null);
+    } catch (err) {
+      console.error('Failed to save book:', err);
+    }
   };
+
+  // Add effect to keep series options in sync
+  useEffect(() => {
+    const fetchSeriesOptions = async () => {
+      if (!session?.access_token) return;
+      
+      try {
+        const response = await fetch(`${BASE_URL}/series`, {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`
+          }
+        });
+        if (response.ok) {
+          const series = await response.json();
+          setSeriesOptions(series);
+          setOriginalSeriesOptions(series);
+        }
+      } catch (err) {
+        console.error('Failed to fetch series options:', err);
+      }
+    };
+
+    fetchSeriesOptions();
+  }, [session, BASE_URL]);
 
   // --------------------------
   // 🖼️ COVER REVIEW MODE RENDER (Batch mode)
@@ -774,7 +824,8 @@ const deleteBook = (id) => {
     <li>
       <span
         style={{
-          fontSize: '5rem',
+          fontSize: '3rem',
+          fontFamily: 'Anacondas',
           color: '#ccc',
           textDecoration: 'none',
           cursor: 'default',

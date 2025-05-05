@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import './BookDetail.css';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useSession } from '@supabase/auth-helpers-react';
 
 function BookDetail({ books, onBookUpdate }) {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const session = useSession();
 
   const wrapperRef = useRef(null);
 
@@ -22,7 +25,6 @@ function BookDetail({ books, onBookUpdate }) {
   const [quote, setQuote] = useState('');
   const [isEditing, setIsEditing] = useState(false);
 
-
   useEffect(() => {
     const foundBook = books.find(b => b.id.toString() === id);
     if (foundBook) {
@@ -39,7 +41,11 @@ function BookDetail({ books, onBookUpdate }) {
         if (quote === '') setQuote(bookData.quote ?? '');
 
         if (!bookData.page_count) {
-          fetch(`${import.meta.env.VITE_API_BASE_URL}/smartsearch?q=${encodeURIComponent(bookData.title + ' ' + bookData.author)}`)
+          fetch(`${import.meta.env.VITE_API_BASE_URL}/api/smartsearch?q=${encodeURIComponent(bookData.title + ' ' + bookData.author)}`, {
+            headers: {
+              'Authorization': `Bearer ${session?.access_token}`
+            }
+          })
             .then(res => res.json())
             .then(result => {
               if (result?.pageCount) {
@@ -58,31 +64,42 @@ function BookDetail({ books, onBookUpdate }) {
         }
       }
     }
-  }, [bookData, isEditing, summary, pageCount, quote]);
+  }, [bookData, isEditing, summary, pageCount, quote, session]);
 
+  const handleSave = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/books/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
+        body: JSON.stringify({
+          summary,
+          page_count: pageCount,
+          quote
+        })
+      });
 
-  const handleSave = () => {
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/books/${bookData.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        summary,
-        page_count: pageCount,
-        quote
-      })
-    })
-      .then(res => res.json())
-      .then(data => {
-        setIsEditing(false);
-        onBookUpdate(data);
-        setBookData(data); // Use fresh backend response
-        setSummary(data.summary ?? '');
-        setPageCount(data.page_count ?? '');
-        setQuote(data.quote ?? ''); // Ensure quote state is updated
-        console.log('✅ Book details updated:', data);
-        window.location.reload(); // Force refresh to fix state sync issue
-      })
-      .catch(err => console.error('❌ Failed to update book details:', err));
+      if (!response.ok) throw new Error('Failed to update book');
+      
+      const result = await response.json();
+      
+      // Update the book in parent component
+      onBookUpdate(result.book);
+      
+      // Update local state
+      setBookData(result.book);
+      setSummary(result.book.summary ?? '');
+      setPageCount(result.book.page_count ?? '');
+      setQuote(result.book.quote ?? '');
+      setIsEditing(false);
+      
+      // Stay on the same page
+      navigate(`/book/${id}`, { replace: true });
+    } catch (error) {
+      console.error('Error updating book:', error);
+    }
   };
 
   if (!bookData) return (

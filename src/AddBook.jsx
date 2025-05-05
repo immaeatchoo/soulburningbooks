@@ -202,14 +202,7 @@ function AddBook({
                   onChange={handleChange}
                   className="form-control"
                 >
-                  {/* Show all series options, sorted alphabetically because chaos is for amateurs. */}
-                  {seriesOptions
-                    .sort((a, b) => {
-                      if (a === 'Standalone') return -1;
-                      if (b === 'Standalone') return 1;
-                      return a.localeCompare(b);
-                    })
-                    .map((option, index) => (
+                  {seriesOptions.map((option, index) => (
                       <option key={index} value={option}>
                         {option}
                       </option>
