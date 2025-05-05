@@ -985,6 +985,25 @@ function App() {
                         >
                           🗑️ Delete ALL Books
                         </button>
+                        {/* Logout button */}
+                        <button
+                          onClick={async () => {
+                            await supabase.auth.signOut();
+                            setShowSettingsModal(false);
+                          }}
+                          style={{
+                            backgroundColor: '#222',
+                            color: '#fff',
+                            padding: '0.5rem 1rem',
+                            border: 'none',
+                            borderRadius: '4px',
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            marginTop: '1rem'
+                          }}
+                        >
+                          🔓 Logout
+                        </button>
                         {/* Contact link at the bottom of the modal content */}
                         <p style={{ marginTop: '1.5rem', fontSize: '0.9rem', color: '#ccc' }}>
                           📬 Contact: <a href="mailto:soulburningbooks@gmail.com" style={{ color: '#ffcc99', textDecoration: 'underline' }}>soulburningbooks@gmail.com</a>
