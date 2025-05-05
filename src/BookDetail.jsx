@@ -2,8 +2,17 @@ import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import './BookDetail.css';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useSession } from '@supabase/auth-helpers-react';
+// API base URL
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-function BookDetail({ books, onBookUpdate }) {
+// ensure HTTPS + proxy through our backend
+function getCoverUrl(url) {
+  if (!url) return '/fallback.png';
+  const httpsUrl = url.replace(/^http:\/\//i, 'https://');
+  return `${BASE_URL}/api/cover-proxy?url=${encodeURIComponent(httpsUrl)}`;
+}
+
+function BookDetail({ onBookUpdate }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const session = useSession();
@@ -26,11 +35,24 @@ function BookDetail({ books, onBookUpdate }) {
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    const foundBook = books.find(b => b.id.toString() === id);
-    if (foundBook) {
-      setBookData(foundBook);
+    if (!session) return;
+    async function loadBook() {
+      try {
+        const res = await fetch(`${BASE_URL}/api/books/${id}`, {
+          headers: { 'Authorization': `Bearer ${session.access_token}` }
+        });
+        if (!res.ok) throw new Error(`Status ${res.status}`);
+        const data = await res.json();
+        setBookData(data);
+        setSummary(data.summary ?? '');
+        setPageCount(data.page_count ?? '');
+        setQuote(data.quote ?? '');
+      } catch (err) {
+        console.error('Failed to load book detail:', err);
+      }
     }
-  }, [books, id]);
+    loadBook();
+  }, [id, session]);
 
   useEffect(() => {
     if (bookData) {
@@ -149,9 +171,7 @@ function BookDetail({ books, onBookUpdate }) {
           <img
             src={
               bookData.cover
-                ? bookData.cover.startsWith('http')
-                  ? bookData.cover
-                  : `${import.meta.env.VITE_API_BASE_URL}${bookData.cover}`
+                ? getCoverUrl(bookData.cover)
                 : 'fallback-image.jpg'
             }
             alt="cover"
@@ -196,6 +216,7 @@ function BookDetail({ books, onBookUpdate }) {
                 <strong>Est. Reading Time:</strong>{' '}
                 {readingTime > 0 ? `${readingTime} hour${readingTime > 1 ? 's' : ''}` : '??'}
               </p>
+              <p><strong>Rating:</strong> {bookData.rating ? `${bookData.rating} ★` : 'No rating'}</p>
               <div className="book-quote-wrapper" style={{ marginTop: '2rem' }}>
                 <div className={`book-quote-bubble ${quote && quote.length > 130 ? 'long-quote' : ''}`}>
                   {isEditing ? (

@@ -43,6 +43,12 @@ function App() {
 
   /* Connect to backend server via Render */
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  // Helper for proxying book covers and enforcing HTTPS
+  const getCoverUrl = (url) => {
+    if (!url) return '';
+    const httpsUrl = url.startsWith('http://') ? url.replace('http://', 'https://') : url;
+    return `${BASE_URL}/api/cover-proxy?url=${encodeURIComponent(httpsUrl)}`;
+  };
 
   // Fetch books helper function
   const fetchBooks = useCallback(async () => {
@@ -712,7 +718,7 @@ const deleteBook = (id) => {
               <div className="current-cover">
                 <h3>Current Cover</h3>
                 {(book.cover || book.cover_google) ? (
-                  <img src={book.cover || book.cover_google} alt={`${book.title} cover`} />
+                  <img src={book.cover ? book.cover : getCoverUrl(book.cover_google)} alt={`${book.title} cover`} />
                 ) : (
                   <div className="no-cover-placeholder">No cover</div>
                 )}
@@ -824,8 +830,8 @@ const deleteBook = (id) => {
     <li>
       <span
         style={{
-          fontSize: '3rem',
-          marginLeft: '3rem',
+          fontSize: '2.4rem',
+          marginLeft: '10rem',
           fontFamily: 'Anacondas',
           color: '#ccc',
           textDecoration: 'none',
@@ -1380,7 +1386,11 @@ const deleteBook = (id) => {
                           {inlineEditBook.cover
                             ? (
                               <>
-                                <img src={inlineEditBook.cover} alt="Cover" style={{ maxWidth: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center' }} />
+                                <img
+                                  src={ getCoverUrl(inlineEditBook.cover || inlineEditBook.cover_google) }
+                                  alt="Cover"
+                                  style={{ maxWidth: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center' }}
+                                />
                                 {inlineEditBook.cover && (
                                   <button
                                     type="button"
@@ -1597,19 +1607,9 @@ const deleteBook = (id) => {
                         >
                           <img
                             src={
-                              book.cover?.startsWith('http')
+                              book.cover
                                 ? book.cover
-                                : book.cover_google?.startsWith('http')
-                                  ? book.cover_google
-                                  : book.cover_local?.startsWith('http')
-                                    ? book.cover_local
-                                    : book.cover
-                                      ? `${BASE_URL}${book.cover}`
-                                      : book.cover_google
-                                        ? `${BASE_URL}${book.cover_google}`
-                                        : book.cover_local
-                                          ? `${BASE_URL}${book.cover_local}`
-                                          : 'fallback-image.jpg'
+                                : getCoverUrl(book.cover_google)
                             }
                             alt="Cover"
                             style={{
