@@ -48,7 +48,7 @@ function App() {
   const fetchBooks = useCallback(async () => {
     if (!session) return;
 
-    const token = session.access_token;
+    const token = session?.access_token || (await supabase.auth.getSession()).data.session?.access_token;
 
     try {
       const response = await fetch(`${BASE_URL}/api/books`, {
@@ -66,7 +66,7 @@ function App() {
     } catch (err) {
       console.error('Failed to fetch books:', err);
     }
-  }, [session, BASE_URL]);
+  }, [session, BASE_URL, supabase]);
 
   // Token auto-refresh effect for Supabase
   useEffect(() => {
@@ -83,6 +83,19 @@ function App() {
       subscription.unsubscribe();
     };
   }, [supabase, fetchBooks]);
+
+  // Auto-refresh session periodically using Supabase client method
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data?.session) {
+        console.log("🔄 Checking session token age...");
+        // Session refresh handled by Supabase client internally
+      }
+    }, 55 * 60 * 1000); // Every 55 minutes
+
+    return () => clearInterval(interval);
+  }, [supabase.auth]);
 
   // Fetch books when session or BASE_URL or fetchBooks changes
   useEffect(() => {
