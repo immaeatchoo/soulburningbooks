@@ -327,8 +327,11 @@ function App() {
             try {
               await fetch(`${BASE_URL}/api/books/${book.id}`, {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ cover: book.cover })
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${session?.access_token}`,
+                },
+                body: JSON.stringify({ cover: book.cover }),
               });
             } catch (err) {
               console.warn("⚠️ Failed to save cover to backend:", book.title, err);
@@ -388,6 +391,7 @@ function App() {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${session?.access_token}`,
       },
       body: JSON.stringify({ cover: newCoverUrl }),
     })
@@ -471,13 +475,23 @@ function App() {
       rating,
     }));
   };
-  // deleteBook: Ask the user if they're sure, then send the book to the shadow realm (delete from backend)
-  const deleteBook = (id) => {
-    if (window.confirm("Are you sure you want to send this book into the abyss 🔥?")) {
-      fetch(`${BASE_URL}/api/books/${id}?user_id=${user?.id}`, { method: 'DELETE' })
-        .then(() => fetchBooks());
-    }
-  };
+// deleteBook: Ask the user if they're sure, then send the book to the shadow realm (delete from backend)
+const deleteBook = (id) => {
+  if (window.confirm("Are you sure you want to send this book into the abyss 🔥?")) {
+    fetch(`${BASE_URL}/api/books/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${session?.access_token}`,
+      },
+    })
+    .then((res) => {
+      if (!res.ok) throw new Error("Failed to delete book");
+      return res.json();
+    })
+    .then(() => fetchBooks())
+    .catch((err) => console.error('❌ Delete failed:', err));
+  }
+};
   // startEdit: User clicked the ✏️, so we're about to let them mess with this book's info inline
   const startEdit = (book) => {
     fetchBooks();
@@ -913,8 +927,12 @@ function App() {
                           {/* Review Covers */}
                           <button
                             onClick={() => {
-                          fetch(`${BASE_URL}/api/books/pending-review?user_id=${user?.id}`)
-                            .then(res => res.json())
+                              fetch(`${BASE_URL}/books/pending-review`, {
+                                headers: {
+                                  Authorization: `Bearer ${session?.access_token}`,
+                                },
+                              })
+                                .then(res => res.json())
                             .then(data => {
                               setPendingCoverFixes(data);
                               localStorage.setItem('pendingCoverFixes', JSON.stringify(data));
@@ -963,8 +981,13 @@ function App() {
                         <button
                           onClick={() => {
                             if (window.confirm("⚠️ Are you sure? This will delete ALL books. This action cannot be undone.")) {
-                              fetch(`${BASE_URL}/api/books`, { method: 'DELETE' })
-                                .then((res) => {
+                              fetch(`${BASE_URL}/api/books`, {
+                                method: 'DELETE',
+                                headers: {
+                                  Authorization: `Bearer ${session?.access_token}`,
+                                },
+                              })
+                                .then((res) =>  {
                                   if (res.ok) {
                                     setBooks([]);
                                     setPendingCoverFixes([]);
