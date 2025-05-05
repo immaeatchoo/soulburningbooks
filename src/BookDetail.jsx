@@ -1,25 +1,21 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import './BookDetail.css';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useSession } from '@supabase/auth-helpers-react';
 // API base URL
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // Unified cover URL handling: serve local uploads directly, proxy remote covers
 function getCoverUrl(url) {
-  if (!url) return '/fallback.png';
-  // local uploads should be served directly
-  if (url.startsWith('/')) {
-    return `${BASE_URL}${url}`;
-  }
-  // ensure HTTPS for remote covers and proxy through backend
-  const httpsUrl = url.replace(/^http:\/\//i, 'https://');
+  if (!url) return ''; // Handle empty URLs gracefully
+  if (url.startsWith('/')) return `${BASE_URL}${url}`; // Local uploads
+  const httpsUrl = url.replace(/^http:\/\//i, 'https://'); // Ensure HTTPS for remote covers
   return `${BASE_URL}/api/cover-proxy?url=${encodeURIComponent(httpsUrl)}`;
 }
 
 function BookDetail({ onBookUpdate }) {
   const { id } = useParams();
-  const navigate = useNavigate();
+  // Removed unused navigate variable
   const session = useSession();
 
   const wrapperRef = useRef(null);
@@ -95,8 +91,10 @@ function BookDetail({ onBookUpdate }) {
   }, [bookData, isEditing, summary, pageCount, quote, session]);
 
   const handleSave = async () => {
+    if (!session) return;
+
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/books/${id}`, {
+      const response = await fetch(`${BASE_URL}/api/books/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -104,29 +102,22 @@ function BookDetail({ onBookUpdate }) {
         },
         body: JSON.stringify({
           summary,
-          page_count: pageCount,
+          page_count: parseInt(pageCount) || 0,
           quote
         })
       });
 
       if (!response.ok) throw new Error('Failed to update book');
-      
+
       const result = await response.json();
-      
-      // Update the book in parent component
-      onBookUpdate(result.book);
-      
-      // Update local state
-      setBookData(result.book);
-      setSummary(result.book.summary ?? '');
-      setPageCount(result.book.page_count ?? '');
-      setQuote(result.book.quote ?? '');
+
+      // Update both local state and parent component
+      setBookData(prev => ({ ...prev, ...result.book }));
+      if (onBookUpdate) onBookUpdate(result.book);
       setIsEditing(false);
-      
-      // Stay on the same page
-      navigate(`/book/${id}`, { replace: true });
     } catch (error) {
       console.error('Error updating book:', error);
+      alert('Failed to save changes. Please try again.');
     }
   };
 
@@ -151,9 +142,8 @@ function BookDetail({ onBookUpdate }) {
     </>
   );
 
-  // Use the user‐editable pageCount state, or fallback to bookData.page_count
   const effectivePageCount = Number(pageCount) || bookData.page_count || 0;
-  const readingTime = Math.ceil(effectivePageCount / 50); // est. 50 pages/hour
+  const readingTime = Math.ceil(effectivePageCount / 50);
 
   console.log('📘 Rendering BookDetail with:', bookData, { summary, pageCount, quote });
   return (
@@ -174,12 +164,7 @@ function BookDetail({ onBookUpdate }) {
       <div className="book-detail-wrapper" ref={wrapperRef}>
         <div className="book-detail-header">
           <img
-            src={
-              getCoverUrl(
-                // prefer the unified `cover` field, but fall back on either
-                bookData.cover || bookData.cover_google || bookData.cover_local
-              )
-            }
+            src={getCoverUrl(bookData.cover || bookData.cover_google || bookData.cover_local)}
             alt="cover"
             className="book-detail-cover"
           />
@@ -250,7 +235,7 @@ function BookDetail({ onBookUpdate }) {
           <h3>📖 Summary</h3>
           {isEditing ? (
             <textarea
-              value={summary || ''}
+              value={summary}
               onChange={e => setSummary(e.target.value)}
               rows={10}
               className="book-summary-textarea"
@@ -266,25 +251,9 @@ function BookDetail({ onBookUpdate }) {
         </div>
         <div style={{ marginTop: '1rem' }}>
           {isEditing ? (
-            <button
-              type="button"
-              onClick={() => {
-                console.log('Saving book...');
-                handleSave();
-              }}
-            >
-              💾 Save
-            </button>
+            <button onClick={handleSave}>💾 Save</button>
           ) : (
-            <button
-              type="button"
-              onClick={() => {
-                console.log('Entering edit mode');
-                setIsEditing(true);
-              }}
-            >
-              ✏️ Edit
-            </button>
+            <button onClick={() => setIsEditing(true)}>✏️ Edit</button>
           )}
         </div>
       </div>

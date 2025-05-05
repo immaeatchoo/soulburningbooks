@@ -636,28 +636,20 @@ const deleteBook = (id) => {
       }
 
       const result = await response.json();
-      
+
       // Update books state with the updated book
-      setBooks(prevBooks => 
-        prevBooks.map(book => 
+      setBooks(prevBooks =>
+        prevBooks.map(book =>
           book.id === editId ? { ...book, ...result.book } : book
         )
       );
 
-      // Refresh series options
-      const seriesResponse = await fetch(`${BASE_URL}/series`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (seriesResponse.ok) {
-        const series = await seriesResponse.json();
-        setSeriesOptions(series);
-        setOriginalSeriesOptions(series);
-      }
-
+      // Reset editing state
       setEditId(null);
       setInlineEditBook(null);
     } catch (err) {
       console.error('Failed to save book:', err);
+      alert('Failed to save changes. Please try again.');
     }
   };
 
@@ -1580,6 +1572,14 @@ const deleteBook = (id) => {
                         <div style={{ marginTop: '0.5rem', display: 'flex', justifyContent: 'center', gap: '0.5rem' }}>
                           <button
                             type="button"
+                            onClick={() => startEdit(book)}
+                            style={{ cursor: 'pointer', background: 'none', border: 'none' }}
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => deleteBook(inlineEditBook.id)}
                             onClick={() => startEdit(book)}
                             style={{ cursor: 'pointer', background: 'none', border: 'none' }}
                           >
