@@ -188,6 +188,9 @@ function BookDetail({ books, onBookUpdate }) {
               )}</p>
               <p><strong>Rating:</strong> {'★'.repeat(bookData.rating || 0)}</p>
               <p><strong>Est. Reading Time:</strong> {readingTime ? `${readingTime} hr${readingTime > 1 ? 's' : ''}` : '??'}</p>
+              <p><strong>Pages:</strong> {bookData.page_count != null ? bookData.page_count : 'N/A'}</p>
+              <p><strong>Summary:</strong> {bookData.summary?.length ? bookData.summary : 'No summary yet.'}</p>
+              <p><strong>Favorite Quote:</strong> {bookData.quote?.length ? `“${bookData.quote}”` : 'No favorite quote yet.'}</p>
             </div>
             <div className="book-quote-wrapper" style={{ marginTop: '2rem' }}>
               <div className={`book-quote-bubble ${quote && quote.length > 130 ? 'long-quote' : ''}`}>
@@ -223,9 +226,25 @@ function BookDetail({ books, onBookUpdate }) {
         </div>
         <div style={{ marginTop: '1rem' }}>
           {isEditing ? (
-            <button onClick={handleSave}>💾 Save</button>
+            <button
+              type="button"
+              onClick={() => {
+                console.log('Saving book...');
+                handleSave();
+              }}
+            >
+              💾 Save
+            </button>
           ) : (
-            <button onClick={() => setIsEditing(true)}>✏️ Edit</button>
+            <button
+              type="button"
+              onClick={() => {
+                console.log('Entering edit mode');
+                setIsEditing(true);
+              }}
+            >
+              ✏️ Edit
+            </button>
           )}
         </div>
       </div>

@@ -6,7 +6,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useSupabaseClient, useSessionContext } from '@supabase/auth-helpers-react';
 
 // 🛣️ Routing wizardry so we can have multiple pages like a real app
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import ScrollToTop from './ScrollToTop';
 
 // 📄 These are our individual pages (duh)
@@ -825,6 +825,7 @@ const deleteBook = (id) => {
       <span
         style={{
           fontSize: '3rem',
+          marginLeft: '3rem',
           fontFamily: 'Anacondas',
           color: '#ccc',
           textDecoration: 'none',
