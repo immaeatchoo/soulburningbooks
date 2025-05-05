@@ -5,9 +5,14 @@ import { useSession } from '@supabase/auth-helpers-react';
 // API base URL
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-// ensure HTTPS + proxy through our backend
+// Unified cover URL handling: serve local uploads directly, proxy remote covers
 function getCoverUrl(url) {
   if (!url) return '/fallback.png';
+  // local uploads should be served directly
+  if (url.startsWith('/')) {
+    return `${BASE_URL}${url}`;
+  }
+  // ensure HTTPS for remote covers and proxy through backend
   const httpsUrl = url.replace(/^http:\/\//i, 'https://');
   return `${BASE_URL}/api/cover-proxy?url=${encodeURIComponent(httpsUrl)}`;
 }
@@ -170,9 +175,10 @@ function BookDetail({ onBookUpdate }) {
         <div className="book-detail-header">
           <img
             src={
-              bookData.cover
-                ? getCoverUrl(bookData.cover)
-                : 'fallback-image.jpg'
+              getCoverUrl(
+                // prefer the unified `cover` field, but fall back on either
+                bookData.cover || bookData.cover_google || bookData.cover_local
+              )
             }
             alt="cover"
             className="book-detail-cover"
