@@ -53,12 +53,8 @@ function AddBook({
           setSearchResults(cacheRef.current[newBook.title]);
           setShowDropdown(true);
         } else {
-          // First try fetching from local cache with authorization header
-          fetch(`${import.meta.env.VITE_API_BASE_URL}/cached_covers?title=${encodeURIComponent(newBook.title)}`, {
-            headers: {
-              'Authorization': `Bearer ${sessionStorage.getItem('sb-access-token')}`
-            }
-          })
+          // First try fetching from local cache (no auth header)
+          fetch(`${import.meta.env.VITE_API_BASE_URL}/cached_covers?title=${encodeURIComponent(newBook.title)}`)
             .then((res) => res.json())
             .then((cachedData) => {
               if (Array.isArray(cachedData) && cachedData.length > 0) {
@@ -75,12 +71,8 @@ function AddBook({
                 setSearchResults(results);
                 setShowDropdown(results.length > 0);
               } else {
-                // Fallback to live Google API with authorization header
-                fetch(`${import.meta.env.VITE_API_BASE_URL}/api/smartsearch?q=${encodeURIComponent(newBook.title)}`, {
-                  headers: {
-                    'Authorization': `Bearer ${sessionStorage.getItem('sb-access-token')}`
-                  }
-                })
+                // Fallback to live Google API (no auth header)
+                fetch(`${import.meta.env.VITE_API_BASE_URL}/api/smartsearch?q=${encodeURIComponent(newBook.title)}`)
                   .then((res) => res.json())
                   .then((data) => {
                     console.log("[SMART RAW DATA]", data);
@@ -101,8 +93,20 @@ function AddBook({
                       setSearchResults([]);
                       setShowDropdown(false);
                     }
+                  })
+                  .catch((err) => {
+                    // Handle network errors for smartsearch fallback
+                    console.error('Smartsearch fetch error:', err);
+                    setSearchResults([]);
+                    setShowDropdown(false);
                   });
               }
+            })
+            .catch((err) => {
+              // Handle network errors for cached_covers fetch
+              console.error('Cached covers fetch error:', err);
+              setSearchResults([]);
+              setShowDropdown(false);
             });
         }
       } else {
@@ -116,7 +120,8 @@ function AddBook({
   // If the modal shouldn't show, don't even bother rendering it. Save those CPU cycles.
   if (!showModal) return null;
 
-  // This is the big ugly modal overlay. Click outside the modal to close it, unless you have commitment issues.
+  {/* The backdrop is just a fancy way to let you click outside to close the modal. */}
+// This is the big ugly modal overlay. Click outside the modal to close it, unless you have commitment issues.
   return (
     <div className="modal-overlay">
       {/* The backdrop is just a fancy way to let you click outside to close the modal. */}

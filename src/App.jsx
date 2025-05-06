@@ -620,12 +620,12 @@ const deleteBook = (id) => {
     const token = session?.access_token;
     if (!token || !editId) return;
 
-    try {
-      // Ensure date_read is in the correct format (yyyy-MM-dd)
-      const formattedDateRead = inlineEditBook.date_read
-        ? new Date(inlineEditBook.date_read).toISOString().split('T')[0]
-        : null;
+    // Ensure date_read is formatted as yyyy-MM-dd
+    const formattedDateRead = inlineEditBook.date_read
+      ? new Date(inlineEditBook.date_read).toISOString().split('T')[0]
+      : null;
 
+    try {
       const response = await fetch(`${BASE_URL}/api/books/${editId}`, {
         method: 'PATCH',
         headers: {
@@ -634,12 +634,14 @@ const deleteBook = (id) => {
         },
         body: JSON.stringify({
           ...inlineEditBook,
-          date_read: formattedDateRead, // Send formatted date
+          date_read: formattedDateRead,
           user_id: user?.id
         }),
       });
 
       if (!response.ok) {
+        const text = await response.text();
+        console.error('Save Inline error response body:', text);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
