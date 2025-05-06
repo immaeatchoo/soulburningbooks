@@ -621,6 +621,11 @@ const deleteBook = (id) => {
     if (!token || !editId) return;
 
     try {
+      // Ensure date_read is in the correct format (yyyy-MM-dd)
+      const formattedDateRead = inlineEditBook.date_read
+        ? new Date(inlineEditBook.date_read).toISOString().split('T')[0]
+        : null;
+
       const response = await fetch(`${BASE_URL}/api/books/${editId}`, {
         method: 'PATCH',
         headers: {
@@ -629,6 +634,7 @@ const deleteBook = (id) => {
         },
         body: JSON.stringify({
           ...inlineEditBook,
+          date_read: formattedDateRead, // Send formatted date
           user_id: user?.id
         }),
       });
