@@ -7,10 +7,10 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // Unified cover URL handling: serve local uploads directly, proxy remote covers
 function getCoverUrl(url) {
-  if (!url) return '';
-  if (url.startsWith('/')) return `${BASE_URL}${url}`;
-  const httpsUrl = url.startsWith('http://') ? url.replace('http://', 'https://') : url;
-  return `${BASE_URL}/api/cover-proxy?url=${encodeURIComponent(httpsUrl)}`;
+  if (!url) return ''; // Handle empty URLs gracefully
+  if (url.startsWith('/')) return `${BASE_URL}${url}`; // Serve local uploads directly
+  const httpsUrl = url.startsWith('http://') ? url.replace('http://', 'https://') : url; // Ensure HTTPS
+  return `${BASE_URL}/api/cover-proxy?url=${encodeURIComponent(httpsUrl)}`; // Use backend proxy for remote covers
 }
 
 function BookDetail({ onBookUpdate }) {

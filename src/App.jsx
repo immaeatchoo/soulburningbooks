@@ -826,7 +826,7 @@ const deleteBook = (id) => {
         style={{
           fontSize: '2.4rem',
           marginLeft: '10rem',
-          fontFamily: 'Anacondas',
+          fontFamily: 'Calligraffitti',
           color: '#ccc',
           textDecoration: 'none',
           cursor: 'default',
