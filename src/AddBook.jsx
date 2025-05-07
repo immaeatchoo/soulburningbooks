@@ -57,17 +57,18 @@ function AddBook({
           setSearchResults(cacheRef.current[newBook.title]);
           setShowDropdown(true);
         } else {
-          // First try fetching from local cache with authorization header
-          fetch(`${BASE_URL}/cached_covers?title=${encodeURIComponent(newBook.title)}`, {
+          // Directly query the live Google API endpoint with authorization header
+          fetch(`${BASE_URL}/api/smartsearch?q=${encodeURIComponent(newBook.title)}`, {
             headers: {
               'Authorization': `Bearer ${session?.access_token}`
             }
           })
             .then((res) => res.json())
-            .then((cachedData) => {
-              if (Array.isArray(cachedData) && cachedData.length > 0) {
+            .then((data) => {
+              console.log("[SMART RAW DATA]", data);
+              if (Array.isArray(data) && data.length > 0) {
                 const lowerQuery = newBook.title.toLowerCase();
-                const results = cachedData
+                const results = data
                   .filter(item => item.cover && item.title?.toLowerCase().includes(lowerQuery))
                   .map(item => ({
                     title: item.title || '',
@@ -79,38 +80,8 @@ function AddBook({
                 setSearchResults(results);
                 setShowDropdown(results.length > 0);
               } else {
-                // Fallback to live Google API with authorization header
-                fetch(`${BASE_URL}/api/smartsearch?q=${encodeURIComponent(newBook.title)}`, {
-                  headers: {
-                    'Authorization': `Bearer ${session?.access_token}`
-                  }
-                })
-                  .then((res) => res.json())
-                  .then((data) => {
-                    console.log("[SMART RAW DATA]", data);
-                    if (Array.isArray(data) && data.length > 0) {
-                      const lowerQuery = newBook.title.toLowerCase();
-                      const results = data
-                        .filter(item => item.cover && item.title?.toLowerCase().includes(lowerQuery))
-                        .map(item => ({
-                          title: item.title || '',
-                          author: item.author || '',
-                          thumbnail: item.cover,
-                          infoLink: item.infoLink || ''
-                        }));
-                      cacheRef.current[newBook.title] = results;
-                      setSearchResults(results);
-                      setShowDropdown(results.length > 0);
-                    } else {
-                      setSearchResults([]);
-                      setShowDropdown(false);
-                    }
-                  })
-                  .catch(err => {
-                    console.error('❌ Smart search error:', err);
-                    setSearchResults([]);
-                    setShowDropdown(false);
-                  });
+                setSearchResults([]);
+                setShowDropdown(false);
               }
             })
             .catch(err => {
