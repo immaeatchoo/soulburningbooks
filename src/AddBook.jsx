@@ -24,18 +24,22 @@ const getCoverUrl = (url) => {
 */
 // Kristina: AddBook is now a pure modal component, stateless, with all state/handlers passed in from App.jsx.
 function AddBook({
-    showModal,
-    setShowModal,
-    newBook,
-    setNewBook,
-    newSeriesName,
-    setNewSeriesName,
-    seriesOptions,
-    handleChange,
-    handleSubmit,
-    handleStarClick,
-    setIsReviewingCovers
-    }) {
+  showModal,
+  setShowModal,
+  newBook,
+  setNewBook,
+  newSeriesName,
+  setNewSeriesName,
+  seriesOptions,
+  handleChange,
+  handleSubmit,
+  handleStarClick,
+  setPendingCoverFixes,
+  setCurrentCoverSearchResults,
+  setIsReviewingCovers,
+  BASE_URL,
+  session
+}) {
 
   
   // --- Smart Google Books Search State ---
@@ -54,9 +58,9 @@ function AddBook({
           setShowDropdown(true);
         } else {
           // First try fetching from local cache with authorization header
-          fetch(`${import.meta.env.VITE_API_BASE_URL}/cached_covers?title=${encodeURIComponent(newBook.title)}`, {
+          fetch(`${BASE_URL}/cached_covers?title=${encodeURIComponent(newBook.title)}`, {
             headers: {
-              'Authorization': `Bearer ${sessionStorage.getItem('sb-access-token')}`
+              'Authorization': `Bearer ${session?.access_token}`
             }
           })
             .then((res) => res.json())
@@ -76,9 +80,9 @@ function AddBook({
                 setShowDropdown(results.length > 0);
               } else {
                 // Fallback to live Google API with authorization header
-                fetch(`${import.meta.env.VITE_API_BASE_URL}/api/smartsearch?q=${encodeURIComponent(newBook.title)}`, {
+                fetch(`${BASE_URL}/api/smartsearch?q=${encodeURIComponent(newBook.title)}`, {
                   headers: {
-                    'Authorization': `Bearer ${sessionStorage.getItem('sb-access-token')}`
+                    'Authorization': `Bearer ${session?.access_token}`
                   }
                 })
                   .then((res) => res.json())
@@ -101,8 +105,18 @@ function AddBook({
                       setSearchResults([]);
                       setShowDropdown(false);
                     }
+                  })
+                  .catch(err => {
+                    console.error('❌ Smart search error:', err);
+                    setSearchResults([]);
+                    setShowDropdown(false);
                   });
               }
+            })
+            .catch(err => {
+              console.error('❌ Smart search error:', err);
+              setSearchResults([]);
+              setShowDropdown(false);
             });
         }
       } else {
@@ -111,7 +125,7 @@ function AddBook({
       }
     }, 400);
     return () => clearTimeout(delayDebounce);
-  }, [newBook.title]);
+  }, [newBook.title, BASE_URL, session?.access_token]);
 
   // If the modal shouldn't show, don't even bother rendering it. Save those CPU cycles.
   if (!showModal) return null;
@@ -275,7 +289,7 @@ function AddBook({
                 fetch(`${import.meta.env.VITE_API_BASE_URL}/api/upload_cover`, {
                   method: 'POST',
                   headers: {
-                    'Authorization': `Bearer ${sessionStorage.getItem('sb-access-token')}`
+                    'Authorization': `Bearer ${session?.access_token}`
                   },
                   body: formData
                 })
@@ -317,6 +331,9 @@ function AddBook({
                 type="button"
                 className="review-covers-button small-button"
                 onClick={() => {
+                  // Kick off a cover‐review pass for the just-entered book:
+                  setPendingCoverFixes([{ ...newBook }]);
+                  setCurrentCoverSearchResults({});
                   setIsReviewingCovers(true);
                   setShowModal(false);
                 }}
