@@ -720,7 +720,7 @@ const deleteBook = (id) => {
               <div className="current-cover">
                 <h3>Current Cover</h3>
                 {(book.cover || book.cover_google) ? (
-                  <img src={getCoverUrl(book.cover || book.cover_google || book.cover_local)} alt={`${book.title} cover`} />
+                  <img src={getCoverUrl(book.cover)} alt={`${book.title} cover`} />
                 ) : (
                   <div className="no-cover-placeholder">No cover</div>
                 )}
