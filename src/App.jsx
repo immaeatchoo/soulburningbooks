@@ -1505,7 +1505,11 @@ const deleteBook = (id) => {
                         />
                         <input
                           type="date"
-                          value={inlineEditBook.date_read || ''}
+                          value={
+                            inlineEditBook.date_read
+                              ? new Date(inlineEditBook.date_read).toISOString().split('T')[0]
+                              : ''
+                          }
                           onChange={(e) => setInlineEditBook((b) => ({ ...b, date_read: e.target.value }))}
                           className="form-control"
                           placeholder="Date Read"
@@ -1608,12 +1612,8 @@ const deleteBook = (id) => {
                           }}
                         >
                           <img
-                            src={
-                              book.cover
-                                ? book.cover
-                                : getCoverUrl(book.cover_google)
-                            }
-                            alt="Cover"
+                            src={getCoverUrl(book.cover)}
+                            alt={`${book.title} cover`}
                             style={{
                               maxWidth: '100%',
                               height: '180px',
