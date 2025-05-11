@@ -129,11 +129,15 @@ function AddBook({
                 required
                 className="form-control"
                 autoComplete="off"
+                onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
               />
               {/* Smart Google Books Search Dropdown */}
               {showDropdown && searchResults.length > 0 && (
                 <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 2000 }}>
-                  <div className="smart-search-dropdown">
+                  <div
+                    className="smart-search-dropdown"
+                    onMouseDown={(e) => e.preventDefault()}
+                  >
                     {searchResults.map((book, index) => (
                       <div
                         key={index}
