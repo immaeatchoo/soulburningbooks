@@ -675,20 +675,23 @@ const deleteBook = (id) => {
   useEffect(() => {
     const fetchSeriesOptions = async () => {
       if (!session?.access_token) return;
-      
+
       try {
-        const response = await fetch(`${BASE_URL}/series`, {
+        const response = await fetch(`${BASE_URL}/api/books`, {
           headers: {
-            'Authorization': `Bearer ${session.access_token}`
+            Authorization: `Bearer ${session.access_token}`
           }
         });
+
         if (response.ok) {
-          const series = await response.json();
-          setSeriesOptions(series);
-          setOriginalSeriesOptions(series);
+          const books = await response.json();
+          const seriesSet = new Set(books.map(book => book.series || 'Standalone'));
+          const seriesArray = Array.from(seriesSet).sort();
+          setSeriesOptions(seriesArray);
+          setOriginalSeriesOptions(seriesArray);
         }
       } catch (err) {
-        console.error('Failed to fetch series options:', err);
+        console.error('Failed to fetch series from books:', err);
       }
     };
 
