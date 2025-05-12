@@ -1266,7 +1266,6 @@ const deleteBook = (id) => {
                       {/* Save Changes button */}
                       <button
                         onClick={() => {
-                          // NEW LOGIC: robust rename/delete mapping for series (improved per request)
                           const updatedSeriesMap = {};
 
                           const originalSet = new Set(originalSeriesOptions.map(s => s.trim().toLowerCase()));
@@ -1301,10 +1300,17 @@ const deleteBook = (id) => {
                               return res.json();
                             })
                             .then(() => {
-                              return fetchBooks();
+                              // 🔄 Re-fetch updated series list from backend
+                              return fetch(`${BASE_URL}/series`, {
+                                headers: {
+                                  'Authorization': `Bearer ${session?.access_token}`
+                                }
+                              });
                             })
-                            .then(() => {
-                              setOriginalSeriesOptions([...seriesOptions]);
+                            .then(res => res.json())
+                            .then(updatedSeries => {
+                              setSeriesOptions(updatedSeries);
+                              setOriginalSeriesOptions(updatedSeries);
                               setShowSeriesManager(false);
                               alert('✅ Series changes saved and synced!');
                             })
