@@ -308,10 +308,9 @@ function App() {
   // --------------------------
   const fetchNewCovers = async (book) => {
     const bookKey = `${book.title.toLowerCase()}-${book.author.toLowerCase()}`;
-    // Reset the current cover search results for this book at the start
     setCurrentCoverSearchResults(prev => ({
       ...prev,
-      [bookKey]: []
+      [bookKey]: [] // Reset results for this book
     }));
     const cached = localStorage.getItem(`covers-${bookKey}`);
     if (cached) {
@@ -319,75 +318,17 @@ function App() {
         ...prev,
         [bookKey]: JSON.parse(cached)
       }));
-      setIsFetchingCovers(false);
       return;
     }
-    setIsFetchingCovers(true);
-    if (!book.cover) {
-      try {
-        const response = await fetch(`${BASE_URL}/api/smartsearch?q=intitle:${encodeURIComponent(book.title)}+inauthor:${encodeURIComponent(book.author)}`, {
-          headers: {
-            Authorization: `Bearer ${session?.access_token}`,
-          }
-        });
-        const data = await response.json();
-        if (data.items?.length) {
-          const first = data.items[0].volumeInfo;
-          if (first.imageLinks?.thumbnail) {
-            book.cover = first.imageLinks.thumbnail;
-            book.cover_google = first.imageLinks.thumbnail;
-            try {
-              await fetch(`${BASE_URL}/api/books/${book.id}`, {
-                method: "PATCH",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${session?.access_token}`,
-                },
-                body: JSON.stringify({ cover: book.cover }),
-              });
-            } catch (err) {
-              console.warn("⚠️ Failed to save cover to backend:", book.title, err);
-            }
-          }
-        }
-      } catch (err) {
-        console.warn("❌ Cover fetch failed for:", book.title, err);
-      }
-    }
-    // Helper to collect unique covers (max 6)
-    const tryFetch = async (query) => {
-      const response = await fetch(`${BASE_URL}/api/smartsearch?q=${query}`, {
+    setIsFetchingCovers(true); // Show loading spinner
+    try {
+      const response = await fetch(`${BASE_URL}/api/smartsearch?q=intitle:${encodeURIComponent(book.title)}+inauthor:${encodeURIComponent(book.author)}`, {
         headers: {
           Authorization: `Bearer ${session?.access_token}`,
         }
       });
       const data = await response.json();
-      const covers = [];
-      if (data.items?.length) {
-        data.items.forEach(item => {
-          if (item.volumeInfo?.imageLinks?.thumbnail) {
-            const thumb = item.volumeInfo.imageLinks.thumbnail;
-            if (!covers.includes(thumb)) {
-              covers.push(thumb);
-            }
-          }
-        });
-        if (covers.length > 6) covers.length = 6;
-      }
-      return covers;
-    };
-    try {
-      let covers = await tryFetch(`intitle:${encodeURIComponent(book.title)}+inauthor:${encodeURIComponent(book.author)}`);
-      if (covers.length < 6) {
-        // Try to get more covers by searching by title only
-        const extraCovers = await tryFetch(`intitle:${encodeURIComponent(book.title)}`);
-        // Merge new unique covers, up to 6
-        extraCovers.forEach(thumb => {
-          if (!covers.includes(thumb) && covers.length < 6) {
-            covers.push(thumb);
-          }
-        });
-      }
+      const covers = data.map(item => item.cover).filter(Boolean).slice(0, 6); // Max 6 covers
       setCurrentCoverSearchResults(prev => ({
         ...prev,
         [bookKey]: covers
@@ -395,9 +336,11 @@ function App() {
       localStorage.setItem(`covers-${bookKey}`, JSON.stringify(covers));
     } catch (err) {
       console.error('Failed to fetch new covers:', err);
+    } finally {
+      setIsFetchingCovers(false); // Hide loading spinner
     }
-    setIsFetchingCovers(false);
   };
+
   const selectNewCover = async (book, newCoverUrl) => {
     removeBookFromPending(book);
 
@@ -1381,9 +1324,7 @@ const deleteBook = (id) => {
               {books.length === 0 ? (
                 <p>No books yet...</p>
               ) : (
-                <div
-                  className="book-grid"
-                >
+                <div className="book-grid">
                   {currentBooks.map((book) => (
                     editId === book.id ? (
                       // 🛑 Inline Edit Card: Updated structure for consistency and polish

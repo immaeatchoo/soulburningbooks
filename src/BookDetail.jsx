@@ -122,6 +122,27 @@ function BookDetail({ onBookUpdate }) {
     }
   };
 
+  const fetchNewCovers = async (book) => {
+    if (!book || !session) return;
+
+    try {
+      const response = await fetch(`${BASE_URL}/api/books/${book.id}/covers`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      });
+
+      if (!response.ok) throw new Error('Failed to fetch new covers');
+
+      const result = await response.json();
+      setBookData(prev => ({ ...prev, ...result.book }));
+    } catch (error) {
+      console.error('Error fetching new covers:', error);
+      alert('Failed to fetch new covers. Please try again.');
+    }
+  };
+
   if (!bookData) return (
     <>
       <button
@@ -313,6 +334,14 @@ function BookDetail({ onBookUpdate }) {
           ) : (
             <button onClick={() => setIsEditing(true)} title="Ready your red pen of judgment">✏️ Edit</button>
           )}
+        </div>
+        <div style={{ marginTop: '1rem' }}>
+          <button
+            onClick={() => fetchNewCovers(bookData)}
+            title="Fetch alternate covers for this book"
+          >
+            🔄 Refetch Covers
+          </button>
         </div>
       </div>
     </>

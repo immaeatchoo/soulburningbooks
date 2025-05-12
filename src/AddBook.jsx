@@ -37,6 +37,7 @@ function AddBook({
   setPendingCoverFixes,
   setCurrentCoverSearchResults,
   setIsReviewingCovers,
+  fetchNewCovers,
   BASE_URL,
   session
 }) {
@@ -316,7 +317,7 @@ function AddBook({
                   setPendingCoverFixes([{ ...newBook }]);
                   setCurrentCoverSearchResults({});
                   setIsReviewingCovers(true);
-                  
+                  fetchNewCovers(newBook); // Trigger cover fetching
                 }}
                 title="Summon alternate realities of this book's face"
               >
