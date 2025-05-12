@@ -822,44 +822,66 @@ const deleteBook = (id) => {
           }}
         >
         <nav className="main-nav">
-  <ul>
-    <li><Link to="/home">Home</Link></li> {/* <-- THIS FIXES IT */}
-    <li><Link to="/">My Libraries</Link></li>
-    <li><Link to="/bookshelf">My Bookshelf</Link></li>
-    <li><Link to="/yearly-wrapup">My Yearly Wrapup</Link></li>
-    <li><Link to="/dnf">DNF</Link></li>
-    {/* Always show user first name */}
-    <li>
-      <span
-        style={{
-          fontSize: '2.4rem',
-          marginLeft: '10rem',
-          fontFamily: 'Calligraffitti',
-          color: '#ccc',
-          textDecoration: 'none',
-          cursor: 'default',
-        }}
-      >
-        {user.user_metadata?.first_name || 'User'}
-      </span>
-    </li>
-  </ul>
-  <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
-    <button
-      onClick={() => setShowSettingsModal(true)}
-      style={{
-        background: 'none',
-        border: 'none',
-        fontSize: '1.5rem',
-        color: '#ccc',
-        cursor: 'pointer'
-      }}
-      title="Settings"
-    >
-      ⚙️
-    </button>
-  </div>
-</nav>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <ul>
+              <li>
+                <Link to="/home" title="Where the chaos begins">
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link to="/" title="Shelf of shame and semi-accomplishment">
+                  My Libraries
+                </Link>
+              </li>
+              <li>
+                <Link to="/bookshelf" title="Proof you're avoiding real life">
+                  My Bookshelf
+                </Link>
+              </li>
+              <li>
+                <Link to="/yearly-wrapup" title="Look at you pretending to have your life together">
+                  My Yearly Wrapup
+                </Link>
+              </li>
+              <li>
+                <Link to="/dnf" title="Abandoned like my will to socialize">
+                  DNF
+                </Link>
+              </li>
+              {/* Always show user first name */}
+              <li>
+                <span
+                  style={{
+                    fontSize: '1.4rem',
+                    fontFamily: 'Calligraffitti',
+                    color: '#ccc',
+                    textDecoration: 'none',
+                    cursor: 'default',
+                  }}
+                  title="Definitely not procrastinating. Nope."
+                >
+                  🧠 {user.user_metadata?.first_name || 'Book Witch'} is online and ignoring responsibilities
+                </span>
+              </li>
+            </ul>
+          </div>
+          <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
+            <button
+              onClick={() => setShowSettingsModal(true)}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontSize: '1.5rem',
+                color: '#ccc',
+                cursor: 'pointer'
+              }}
+              title="Settings"
+            >
+              ⚙️
+            </button>
+          </div>
+        </nav>
         <div className="page-banner">
           <h1 className="page-banner-text">Page Turning &amp; Soul Burning</h1>
         </div>
@@ -977,6 +999,7 @@ const deleteBook = (id) => {
                         <img src="/Goodreads.png" alt="Goodreads Import" style={{ width: '32px', height: '32px', marginBottom: '0.5rem' }} />
                         <div style={{ fontSize: '0.9rem', color: '#ccc' }}>Import Goodreads CSV</div>
                         <input
+                          title="Summon CSV demons from the depths of your computer"
                           id="import-csv"
                           type="file"
                           accept=".csv"
@@ -1011,6 +1034,7 @@ const deleteBook = (id) => {
                           setShowSettingsModal(false);
                             }}
                             style={{
+                        
                               backgroundColor: '#333',
                               color: '#fff',
                               padding: '0.5rem 1rem',
@@ -1044,45 +1068,46 @@ const deleteBook = (id) => {
                       </button>
                         </div>
                         {/* Delete All Books below the flex container */}
-                        <button
-                          onClick={() => {
-                            if (window.confirm("⚠️ Are you sure? This will delete ALL books. This action cannot be undone.")) {
-                              fetch(`${BASE_URL}/api/books`, {
-                                method: 'DELETE',
-                                headers: {
-                                  Authorization: `Bearer ${session?.access_token}`,
-                                },
-                              })
-                                .then((res) =>  {
-                                  if (res.ok) {
-                                    setBooks([]);
-                                    setPendingCoverFixes([]);
-                                    localStorage.setItem('pendingCoverFixes', JSON.stringify([]));
-                                    setIsReviewingCovers(false);
-                                    alert("✅ All books deleted successfully.");
-                                  } else {
-                                    console.error("Failed to mass delete books.");
-                                  }
-                                })
-                                .catch((err) => console.error("Mass delete failed:", err));
-                            }
-                          }}
-                          style={{
-                            margin: '1rem 0',
-                            backgroundColor: '#500',
-                            color: '#fff',
-                            padding: '0.5rem 1rem',
-                            border: 'none',
-                            borderRadius: '4px',
-                            fontWeight: 'bold',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          🗑️ Delete ALL Books
-                        </button>
-                        {/* Logout button */}
-                        <button
-                          onClick={async () => {
+                                    <button
+                                      onClick={() => {
+                                      if (window.confirm("⚠️ Are you sure? This will delete ALL books. This action cannot be undone.")) {
+                                        fetch(`${BASE_URL}/api/books`, {
+                                        method: 'DELETE',
+                                        headers: {
+                                          Authorization: `Bearer ${session?.access_token}`,
+                                        },
+                                        })
+                                        .then((res) =>  {
+                                          if (res.ok) {
+                                          setBooks([]);
+                                          setPendingCoverFixes([]);
+                                          localStorage.setItem('pendingCoverFixes', JSON.stringify([]));
+                                          setIsReviewingCovers(false);
+                                          alert("✅ All books deleted successfully.");
+                                          } else {
+                                          console.error("Failed to mass delete books.");
+                                          }
+                                        })
+                                        .catch((err) => console.error("Mass delete failed:", err));
+                                      }
+                                      }}
+                                      style={{
+                                      margin: '1rem 0',
+                                      backgroundColor: '#500',
+                                      color: '#fff',
+                                      padding: '0.5rem 1rem',
+                                      border: 'none',
+                                      borderRadius: '4px',
+                                      fontWeight: 'bold',
+                                      cursor: 'pointer'
+                                      }}
+                                      title="Banish every book into oblivion"
+                                    >
+                                      🗑️ Delete ALL Books
+                                    </button>
+                                    {/* Logout button */}
+                                    <button
+                                      onClick={async () => {
                             await supabase.auth.signOut();
                             setShowSettingsModal(false);
                           }}
@@ -1096,6 +1121,7 @@ const deleteBook = (id) => {
                             cursor: 'pointer',
                             marginTop: '1rem'
                           }}
+                          title="Escape before the TBR devours you"
                         >
                           🔓 Logout
                         </button>
@@ -1304,6 +1330,7 @@ const deleteBook = (id) => {
               {/* 🛑 Button to Open the Modal */}
               <button
                 className="open-modal-button"
+                title="Another one? Do you even work?"
                 onClick={() => {
                   setNewBook({
                     title: '',
@@ -1325,12 +1352,13 @@ const deleteBook = (id) => {
               {/* 🛑 Sort Dropdown */}
               <div style={{ margin: '1rem 0', textAlign: 'center' }}>
                 <label>
-                  Sort by: {' '}
+                label title="Because chaos needs *some* structure"
+                  Sort this unholy mess by: {' '}
                   <select value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
-                    <option value="title">Title</option>
-                    <option value="author">Author</option>
-                    <option value="series">Series</option>
-                    <option value="rating">Rating</option>
+                  <option value="title" title="How normal human sort">Title</option>
+    <option value="author" title="For when you blame the author for your emotional damage">Author</option>
+    <option value="series" title="Because some stories are commitment traps">Series</option>
+    <option value="rating" title="From literary gods to 'what the hell was that?">Rating</option>
                   </select>
                 </label>
               </div>
@@ -1435,7 +1463,7 @@ const deleteBook = (id) => {
                             cursor: 'pointer',
                             color: '#ccc'
                           }}
-                          title="Review Cover for This Book"
+                          title="Give this cover a facelift?"
                         >
                           🔍 Review Cover
                         </button>

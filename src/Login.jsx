@@ -39,12 +39,21 @@ function LoginModal({ isOpen, onClose }) {
     <div className="login-modal-overlay">
       <div className="login-modal-backdrop" onClick={onClose}>
         <div className="login-modal-content" onClick={(e) => e.stopPropagation()}>
-          <button className="login-close-btn" onClick={onClose}>❌</button>
+          <button
+            className="login-close-btn"
+            onClick={onClose}
+            title="Abort mission"
+          >❌</button>
 
           {/* 🔥 Logo Goes Here */}
-          <img src="/ptsb_logo.jpg" alt="Page Turning & Soul Burning" className="login-logo" />
+          <img
+            src="/ptsb_logo.jpg"
+            alt="Page Turning & Soul Burning"
+            className="login-logo"
+            title="Welcome to the drama-filled reading spiral"
+          />
 
-          <h2>🔐 {isSignUp ? 'Create Account' : 'Login'}</h2>
+          <h2 title="Gain access to your hoard of regretful reads">🔐 {isSignUp ? 'Create Account' : 'Login'}</h2>
           <form onSubmit={handleLogin} className="login-form">
             <input
               type="email"
@@ -52,6 +61,7 @@ function LoginModal({ isOpen, onClose }) {
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
+              title="So we can spam you with your own decisions"
             />
             <input
               type="password"
@@ -59,6 +69,7 @@ function LoginModal({ isOpen, onClose }) {
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
+              title="Enter your secrets (we won't judge... much)"
             />
             {isSignUp && (
               <>
@@ -68,6 +79,7 @@ function LoginModal({ isOpen, onClose }) {
                   value={firstName}
                   onChange={e => setFirstName(e.target.value)}
                   required
+                  title="What's the name your books whisper when you're asleep?"
                 />
                 <input
                   type="text"
@@ -75,25 +87,29 @@ function LoginModal({ isOpen, onClose }) {
                   value={lastName}
                   onChange={e => setLastName(e.target.value)}
                   required
+                  title="Or make one up. You're a legend anyway."
                 />
               </>
             )}
             <div className="login-actions">
               {!isSignUp ? (
                 <>
-                  <button type="submit">🚪 Sign In</button>
-                  <button type="button" onClick={() => setIsSignUp(true)}>🆕 Create Account</button>
+                  <button type="submit" title="Brace yourself for literary judgment">🚪 Sign In</button>
+                  <button type="button" onClick={() => setIsSignUp(true)} title="Enter the bookish cult">🆕 Create Account</button>
                 </>
               ) : (
                 <>
-                  <button type="button" onClick={handleSignup}>✨ Sign Up</button>
-                  <button type="button" onClick={() => setIsSignUp(false)}>🔙 Back to Login</button>
+                  <button type="button" onClick={handleSignup} title="Sign away your soul (and inbox)">✨ Sign Up</button>
+                  <button type="button" onClick={() => setIsSignUp(false)} title="Flee the signup screen like a commitment-phobe">🔙 Back to Login</button>
                 </>
               )}
             </div>
             {error && <p className="login-error-msg">{error}</p>}
           </form>
-          <p className="contact-help">Having trouble? <a href="mailto:soulburningbooks@gmail.com">Contact us</a></p>
+          <p className="contact-help">
+            Having trouble?{' '}
+            <a href="mailto:soulburningbooks@gmail.com" title="Scream into the void (or email us)">Contact us</a>
+          </p>
           </div>
         </div>
       </div>

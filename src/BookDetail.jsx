@@ -20,13 +20,9 @@ function BookDetail({ onBookUpdate }) {
 
   const wrapperRef = useRef(null);
 
-  // Scroll to top of the wrapper when navigating between books
+  // Always scroll to the top of the page when entering BookDetail
   useLayoutEffect(() => {
-    if (wrapperRef.current) {
-      wrapperRef.current.scrollIntoView({ block: 'start', behavior: 'auto' });
-      // Nudge up a bit more to clear any fixed headers/margins
-      window.scrollBy(0, -40);
-    }
+    window.scrollTo({ top: 0, behavior: 'auto' });
   }, [id]);
   const [bookData, setBookData] = useState(null);
 
@@ -133,6 +129,7 @@ function BookDetail({ onBookUpdate }) {
           }
         }}
         className="back-button"
+        title="Retreat like the unprepared gremlin you are"
       >
         ← Back
       </button>
@@ -158,6 +155,7 @@ function BookDetail({ onBookUpdate }) {
           }
         }}
         className="back-button"
+        title="Retreat like the unprepared gremlin you are"
       >
         ← Back
       </button>
@@ -171,9 +169,9 @@ function BookDetail({ onBookUpdate }) {
           <div style={{ flex: 1 }}>
             {bookData.series && (
               <div className="book-series-info">
-                <p className="series-name">{bookData.series}</p>
+                <p className="series-name" title="Another never-ending emotional rollercoaster">{bookData.series}</p>
                 {bookData.book_number && (
-                  <p className="series-number">Book {bookData.book_number}</p>
+                  <p className="series-number" title="Commitment level: questionable">Book {bookData.book_number}</p>
                 )}
                 {bookData.series.toLowerCase() !== 'standalone' && (
                   <p className="series-link">
@@ -188,35 +186,36 @@ function BookDetail({ onBookUpdate }) {
               <h1 className="book-title">{bookData.title}</h1>
               <h2>by {bookData.author}</h2>
               <p>
-                <strong>Date Read:</strong>{' '}
+                <strong title="Ah yes, the date your soul left your body">Date Read:</strong>{' '}
                 {bookData.date_read
                   ? new Date(bookData.date_read).toLocaleDateString('en-US')
                   : 'Unknown'}
               </p>
-              <p><strong>Pages:</strong> {isEditing ? (
+              <p><strong title="Pages you survived without DNF-ing">Pages:</strong> {isEditing ? (
                 <input
                   type="number"
                   value={pageCount}
                   onChange={e => setPageCount(e.target.value)}
                   style={{ width: '80px' }}
+                  title="Pages you survived without DNF-ing"
                 />
               ) : (
                 (pageCount || bookData.page_count) || '??'
               )}</p>
               <p>
-                <strong>Est. Reading Time:</strong>{' '}
+                <strong title="Based on the sacred average of 50 pages per hour">Est. Reading Time:</strong>{' '}
                 {readingTime > 0 ? `${readingTime} hour${readingTime > 1 ? 's' : ''}` : '??'}
               </p>
-              <p><strong>Rating:</strong> {bookData.rating ? `${bookData.rating} ★` : 'No rating'}</p>
+              <p><strong title="One star? Bold. Five? Who hurt you?">Rating:</strong> {bookData.rating ? `${bookData.rating} ★` : 'No rating'}</p>
               <div className="book-quote-wrapper" style={{ marginTop: '2rem' }}>
-                <div className={`book-quote-bubble ${quote && quote.length > 130 ? 'long-quote' : ''}`}>
+                <div className={`book-quote-bubble ${quote && quote.length > 130 ? 'long-quote' : ''}`} title="The line that either broke you or made you laugh like a maniac">
                   {isEditing ? (
                     <textarea
                       value={quote || ''}
                       onChange={e => setQuote(e.target.value)}
                       rows={3}
                       className="book-quote-textarea"
-                      placeholder="Favorite Quote"
+                      placeholder="Drop the quote that stabbed your feelings here"
                     />
                   ) : (
                     <blockquote>
@@ -232,13 +231,14 @@ function BookDetail({ onBookUpdate }) {
           </div>
         </div>
         <div className="book-detail-summary">
-          <h3>📖 Summary</h3>
+          <h3 title="Spoil everything. Be dramatic.">📖 Summary</h3>
           {isEditing ? (
             <textarea
               value={summary}
               onChange={e => setSummary(e.target.value)}
               rows={10}
               className="book-summary-textarea"
+              placeholder="Summarize the trauma, chaos, or plot holes"
             />
           ) : (
             <p>
@@ -251,9 +251,9 @@ function BookDetail({ onBookUpdate }) {
         </div>
         <div style={{ marginTop: '1rem' }}>
           {isEditing ? (
-            <button onClick={handleSave}>💾 Save</button>
+            <button onClick={handleSave} title="Seal your edits into bookish history">💾 Save</button>
           ) : (
-            <button onClick={() => setIsEditing(true)}>✏️ Edit</button>
+            <button onClick={() => setIsEditing(true)} title="Ready your red pen of judgment">✏️ Edit</button>
           )}
         </div>
       </div>

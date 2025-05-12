@@ -51,11 +51,11 @@ function SeriesPage() {
   return (
     <div className="series-page-container">
       <div style={{ width: '100%', textAlign: 'left' }}>
-        <Link to="/" className="series-back-button">
+        <Link to="/" className="series-back-button" title="Flee back to your messy library">
           ⬅ Back to Library
         </Link>
       </div>
-      <h1 className="series-header">Series: {seriesName}</h1>
+      <h1 className="series-header" title="You're deep into the saga now, no turning back">Series: {seriesName}</h1>
       {books && books.length > 0 ? (
         <ul className="series-book-list">
           {books.map((book) => (
@@ -69,17 +69,18 @@ function SeriesPage() {
                   src={getCoverUrl(book.cover_google || book.cover_local)}
                   alt={`Cover of ${book.title}`}
                   className="series-book-cover"
+                  title={`Judging this book by its cover. (${book.title})`}
                 />
                 <div className="series-book-info">
-                  <span className="series-book-number">#{book.book_number || '?'}</span>
-                  <span className="series-book-title">{book.title}</span>
+                  <span className="series-book-number" title="Which chapter of your series spiral this is">#{book.book_number || '?'}</span>
+                  <span className="series-book-title" title="Another step into the obsession abyss">{book.title}</span>
                 </div>
               </Link>
             </li>
           ))}
         </ul>
       ) : (
-        <p className="series-book-author">No books found in this series.</p>
+        <p className="series-book-author" title="Nothing to see here, just your unfulfilled TBR">No books found in this series.</p>
       )}
     </div>
   );

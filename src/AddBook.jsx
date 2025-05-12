@@ -114,7 +114,7 @@ function AddBook({
           style={{ overflow: 'visible' }}
         >
           {/* The ✖ button is here for people who hate their mouse. */}
-          <button className="close-button" onClick={() => setShowModal(false)}>✖</button>
+          <button className="close-button" onClick={() => setShowModal(false)} title="Abandon ship">✖</button>
           {/* The actual form for adding a book. Yes, it's long. */}
           <form onSubmit={handleSubmit} className="add-book-form">
             {/* Row for title and author, because that's all anyone cares about. */}
@@ -130,6 +130,7 @@ function AddBook({
                 className="form-control"
                 autoComplete="off"
                 onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                title="Give it a name, or forever hold your regret"
               />
               {/* Smart Google Books Search Dropdown */}
               {showDropdown && searchResults.length > 0 && (
@@ -188,6 +189,7 @@ function AddBook({
                 value={newBook.author}
                 onChange={handleChange}
                 className="form-control"
+                title="Or just say 'Anonymous' and gaslight future you"
               />
             {/* End of title and author row */}
             </div>
@@ -200,6 +202,7 @@ function AddBook({
                   value={newBook.series}
                   onChange={handleChange}
                   className="form-control"
+                  title="Choose your poison... or start a new one"
                 >
                   {seriesOptions.map((option, index) => (
                       <option key={index} value={option}>
@@ -230,6 +233,7 @@ function AddBook({
                       }
                     }}
                     required
+                    title="Daring to start a saga, huh? Bold move"
                   />
                 </>
               )}
@@ -241,6 +245,7 @@ function AddBook({
                 value={newBook.book_number}
                 onChange={handleChange}
                 className="form-control"
+                title="Where it sits in your spiral of commitment"
               />
               {/* Date read input. For the memory hoarders. */}
               <input
@@ -250,6 +255,7 @@ function AddBook({
                 value={newBook.date_read}
                 onChange={handleChange}
                 className="form-control"
+                title="The day your soul left your body (or just when you finished the book)"
               />
             </div>
             {/* Cover upload area. Drag and drop your pretty pictures here. */}
@@ -279,6 +285,7 @@ function AddBook({
                 marginBottom: '1rem',
                 textAlign: 'center'
               }}
+              title="Drop your lies here – aka a pretty cover"
             >
               {/* Show the cover image if available, otherwise beg for a drag-and-drop. */}
               {newBook.cover
@@ -294,6 +301,7 @@ function AddBook({
                   className={`star ${star <= newBook.rating ? 'selected' : ''}`}
                   onClick={() => handleStarClick(star)}
                   aria-label={`${star} star`}
+                  title={`I'd rate this a ${star} out of 'please make it stop'`}
                 >
                   <span className="star-icon">★</span>
                 </button>
@@ -312,12 +320,14 @@ function AddBook({
                   setIsReviewingCovers(true);
                   setShowModal(false);
                 }}
+                title="Summon alternate realities of this book's face"
               >
                 🔍 Review Covers
               </button>
               <button
                 type="submit"
                 className="review-covers-button small-button"
+                title={newBook.id ? "Apply your regret edits" : "Sacrifice this title to the library gods"}
               >
                 {newBook.id ? "Update Book" : "Add Book"}
               </button>
