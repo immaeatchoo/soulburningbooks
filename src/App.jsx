@@ -1352,7 +1352,6 @@ const deleteBook = (id) => {
               {/* 🛑 Sort Dropdown */}
               <div style={{ margin: '1rem 0', textAlign: 'center' }}>
                 <label>
-                label title="Because chaos needs *some* structure"
                   Sort this unholy mess by: {' '}
                   <select value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
                   <option value="title" title="How normal human sort">Title</option>
