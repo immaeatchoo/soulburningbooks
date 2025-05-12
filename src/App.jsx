@@ -1185,7 +1185,7 @@ const deleteBook = (id) => {
                       </button>
                       <h2 style={{ marginBottom: '1rem', color: '#ff9966' }}>📖 Manage Series</h2>
                       {/* List series with delete options and inline editing */}
-                      <div className="series-list" style={{ marginBottom: '1rem', maxHeight: '45vh', overflowY: 'auto', padding: '0.5rem', background: 'rgba(0,0,0,0.3)', borderRadius: '6px' }}>
+                      <div className="series-list" style={{ marginBottom: '1rem', maxHeight: '60vh', overflowY: 'auto', padding: '0.5rem', background: 'rgba(0,0,0,0.3)', borderRadius: '6px' }}>
                         {[...seriesOptions].sort().map((series, i) => (
                           <div
                             key={i}
@@ -1222,8 +1222,13 @@ const deleteBook = (id) => {
                             {series !== 'Standalone' && (
                               <button
                                 onClick={() => {
-                                  const updated = seriesOptions.filter(s => s !== series);
-                                  setSeriesOptions(updated);
+                                  const count = books.filter(b => b.series === series).length;
+                                  if (count > 0) {
+                                    if (!window.confirm(`⚠️ ${count} book(s) currently use "${series}". Deleting it will reset them to Standalone. Proceed?`)) {
+                                      return;
+                                    }
+                                  }
+                                  setSeriesOptions(prev => prev.filter(s => s !== series));
                                 }}
                                 style={{
                                   background: 'none',
@@ -1317,22 +1322,6 @@ const deleteBook = (id) => {
                       >
                         💾 Save Changes
                       </button>
-                      {/* Close */}
-                      <div>
-                        <button
-                          onClick={() => setShowSeriesManager(false)}
-                          style={{
-                            marginTop: '2rem',
-                            background: 'none',
-                            color: '#ccc',
-                            border: 'none',
-                            fontSize: '1.2rem',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          ✖ Close
-                        </button>
-                      </div>
                     </div>
                   </div>
                 </div>
