@@ -318,7 +318,7 @@ function AddBook({
                   setPendingCoverFixes([{ ...newBook }]);
                   setCurrentCoverSearchResults({});
                   setIsReviewingCovers(true);
-                  setShowModal(false);
+                  
                 }}
                 title="Summon alternate realities of this book's face"
               >

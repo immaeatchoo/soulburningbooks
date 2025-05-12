@@ -325,7 +325,11 @@ function App() {
     setIsFetchingCovers(true);
     if (!book.cover) {
       try {
-        const response = await fetch(`${BASE_URL}/api/smartsearch?q=intitle:${encodeURIComponent(book.title)}+inauthor:${encodeURIComponent(book.author)}`);
+        const response = await fetch(`${BASE_URL}/api/smartsearch?q=intitle:${encodeURIComponent(book.title)}+inauthor:${encodeURIComponent(book.author)}`, {
+          headers: {
+            Authorization: `Bearer ${session?.access_token}`,
+          }
+        });
         const data = await response.json();
         if (data.items?.length) {
           const first = data.items[0].volumeInfo;
@@ -352,7 +356,11 @@ function App() {
     }
     // Helper to collect unique covers (max 6)
     const tryFetch = async (query) => {
-      const response = await fetch(`${BASE_URL}/api/smartsearch?q=${query}`);
+      const response = await fetch(`${BASE_URL}/api/smartsearch?q=${query}`, {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        }
+      });
       const data = await response.json();
       const covers = [];
       if (data.items?.length) {
@@ -364,7 +372,6 @@ function App() {
             }
           }
         });
-        // Limit to 6 covers max
         if (covers.length > 6) covers.length = 6;
       }
       return covers;
@@ -463,6 +470,7 @@ function App() {
         fetchNewCovers(updated[0]);
       } else {
         setIsReviewingCovers(false);
+        setShowModal(true); // ✅ Reopen the AddBook modal so you can finish the damn entry
         fetchBooks();
       }
     }, 100);
