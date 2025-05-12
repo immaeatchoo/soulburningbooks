@@ -22,7 +22,9 @@ function BookDetail({ onBookUpdate }) {
 
   // Always scroll to the top of the page when entering BookDetail
   useLayoutEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'auto' });
+    if (wrapperRef.current) {
+      wrapperRef.current.scrollIntoView({ behavior: 'auto', block: 'start' });
+    }
   }, [id]);
   const [bookData, setBookData] = useState(null);
 
@@ -30,6 +32,9 @@ function BookDetail({ onBookUpdate }) {
   const [pageCount, setPageCount] = useState('');
   const [quote, setQuote] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+
+  // Settings modal state
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   useEffect(() => {
     if (!session) return;
@@ -145,6 +150,59 @@ function BookDetail({ onBookUpdate }) {
   console.log('📘 Rendering BookDetail with:', bookData, { summary, pageCount, quote });
   return (
     <>
+      {/* Settings button in top right */}
+      <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
+        <button
+          onClick={() => setShowSettingsModal(true)}
+          style={{
+            background: 'none',
+            border: 'none',
+            fontSize: '1.5rem',
+            color: '#ccc',
+            cursor: 'pointer'
+          }}
+          title="Settings"
+        >
+          ⚙️
+        </button>
+      </div>
+      {/* Settings modal overlay */}
+      {showSettingsModal && (
+        <div className="modal-overlay">
+          <div className="modal-backdrop" onClick={() => setShowSettingsModal(false)}>
+            <div
+              className="modal-content"
+              onClick={(e) => e.stopPropagation()}
+              style={{ maxWidth: '500px', padding: '2.5rem', textAlign: 'center', position: 'relative' }}
+            >
+              <button
+                onClick={() => setShowSettingsModal(false)}
+                style={{
+                  position: 'absolute',
+                  top: '1rem',
+                  right: '1rem',
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '1.5rem',
+                  color: '#fff',
+                  cursor: 'pointer'
+                }}
+                title="Close"
+              >
+                ✖️
+              </button>
+              <h2 style={{ marginBottom: '1rem', color: '#ff9966' }}>⚙️ Settings</h2>
+              <p style={{ marginTop: '1.5rem', fontSize: '0.9rem', color: '#ccc' }}>
+                📬 Contact: <a
+                  href="mailto:soulburningbooks@gmail.com"
+                  style={{ color: '#ffcc99', textDecoration: 'underline' }}
+                  title="Summon me with bug reports or chaos requests"
+                >soulburningbooks@gmail.com</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
       <button
         onClick={() => {
           const previousScroll = sessionStorage.getItem('bookGridScroll');

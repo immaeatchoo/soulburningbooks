@@ -859,9 +859,9 @@ const deleteBook = (id) => {
                     textDecoration: 'none',
                     cursor: 'default',
                   }}
-                  title="Definitely not procrastinating. Nope."
+                  title="is online & ignoring responsibilities"
                 >
-                  🧠 {user.user_metadata?.first_name || 'Book Witch'} is online and ignoring responsibilities
+                  📚 Greetings, {user.user_metadata?.first_name || 'Book Witch'}
                 </span>
               </li>
             </ul>
@@ -995,7 +995,11 @@ const deleteBook = (id) => {
                       <h2 style={{ marginBottom: '1rem', color: '#ff9966' }}>⚙️ Settings</h2>
 
                       {/* Goodreads Import */}
-                      <label htmlFor="import-csv" style={{ display: 'block', marginBottom: '1rem', cursor: 'pointer' }}>
+                      <label
+                        htmlFor="import-csv"
+                        style={{ display: 'block', marginBottom: '1rem', cursor: 'pointer' }}
+                        title="Summon CSV demons from the depths of your computer"
+                      >
                         <img src="/Goodreads.png" alt="Goodreads Import" style={{ width: '32px', height: '32px', marginBottom: '0.5rem' }} />
                         <div style={{ fontSize: '0.9rem', color: '#ccc' }}>Import Goodreads CSV</div>
                         <input
@@ -1044,6 +1048,7 @@ const deleteBook = (id) => {
                               cursor: 'pointer',
                               marginTop: '1rem'
                             }}
+                            title="Audit the covers like a fashion judge from hell"
                           >
                             🖼️ Review Covers
                           </button>
@@ -1063,6 +1068,7 @@ const deleteBook = (id) => {
                           marginTop: '1rem',
                           cursor: 'pointer'
                         }}
+                        title="Rename the chaos. Or delete the whole damn saga."
                       >
                         📖 Manage Series
                       </button>
@@ -1127,7 +1133,11 @@ const deleteBook = (id) => {
                         </button>
                         {/* Contact link at the bottom of the modal content */}
                         <p style={{ marginTop: '1.5rem', fontSize: '0.9rem', color: '#ccc' }}>
-                          📬 Contact: <a href="mailto:soulburningbooks@gmail.com" style={{ color: '#ffcc99', textDecoration: 'underline' }}>soulburningbooks@gmail.com</a>
+                          📬 Contact: <a
+                            href="mailto:soulburningbooks@gmail.com"
+                            style={{ color: '#ffcc99', textDecoration: 'underline' }}
+                            title="Summon me with bug reports or chaos requests"
+                          >soulburningbooks@gmail.com</a>
                         </p>
                         {/* No bottom "✖ Close" button here, per instructions */}
                       </div>
@@ -1354,7 +1364,7 @@ const deleteBook = (id) => {
                 <label>
                   Sort this unholy mess by: {' '}
                   <select value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
-                  <option value="title" title="How normal human sort">Title</option>
+                  <option value="title" title="How normal humans sort">Title</option>
     <option value="author" title="For when you blame the author for your emotional damage">Author</option>
     <option value="series" title="Because some stories are commitment traps">Series</option>
     <option value="rating" title="From literary gods to 'what the hell was that?">Rating</option>
