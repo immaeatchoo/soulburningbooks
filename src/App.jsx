@@ -1186,7 +1186,7 @@ const deleteBook = (id) => {
                       <h2 style={{ marginBottom: '1rem', color: '#ff9966' }}>📖 Manage Series</h2>
                       {/* List series with delete options and inline editing */}
                       <div className="series-list" style={{ marginBottom: '1rem', maxHeight: '45vh', overflowY: 'auto', padding: '0.5rem', background: 'rgba(0,0,0,0.3)', borderRadius: '6px' }}>
-                        {seriesOptions.sort().map((series, i) => (
+                        {[...seriesOptions].sort().map((series, i) => (
                           <div
                             key={i}
                             style={{
@@ -1268,56 +1268,39 @@ const deleteBook = (id) => {
                       </button>
                       {/* Save Changes button */}
                       <button
-                        onClick={() => {
+                        onClick={async () => {
+                          // Build updates map as before
                           const updatedSeriesMap = {};
-
                           const originalSet = new Set(originalSeriesOptions.map(s => s.trim().toLowerCase()));
                           const currentSet = new Set(seriesOptions.map(s => s.trim().toLowerCase()));
-
                           originalSeriesOptions.forEach(original => {
-                            const originalNormalized = original.trim().toLowerCase();
-
-                            if (!currentSet.has(originalNormalized)) {
-                              const newlyAddedSeries = seriesOptions.find(s =>
-                                !originalSet.has(s.trim().toLowerCase())
-                              );
-
-                              if (newlyAddedSeries) {
-                                updatedSeriesMap[original] = newlyAddedSeries.trim();
-                              } else {
-                                updatedSeriesMap[original] = 'Standalone';
-                              }
+                            const norm = original.trim().toLowerCase();
+                            if (!currentSet.has(norm)) {
+                              const added = seriesOptions.find(s => !originalSet.has(s.trim().toLowerCase()));
+                              updatedSeriesMap[original] = added ? added.trim() : 'Standalone';
                             }
                           });
 
-                          fetch(`${BASE_URL}/api/series`, {
-                            method: 'PATCH',
-                            headers: {
-                              'Content-Type': 'application/json',
-                              'Authorization': `Bearer ${session?.access_token}`
-                            },
-                            body: JSON.stringify({ updates: updatedSeriesMap })
-                          })
-                            .then(res => {
-                              if (!res.ok) throw new Error('Failed to update series');
-                              return res.json();
-                            })
-                            .then(() => {
-                              // 🔄 Re-fetch updated series list from backend
-                              return fetch(`${BASE_URL}/series`, {
-                                headers: {
-                                  'Authorization': `Bearer ${session?.access_token}`
-                                }
-                              });
-                            })
-                            .then(res => res.json())
-                            .then(updatedSeries => {
-                              setSeriesOptions(updatedSeries);
-                              setOriginalSeriesOptions(updatedSeries);
-                              setShowSeriesManager(false);
-                              alert('✅ Series changes saved and synced!');
-                            })
-                            .catch(err => console.error('Series update failed:', err));
+                          try {
+                            const res = await fetch(`${BASE_URL}/api/series`, {
+                              method: 'PATCH',
+                              headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${session?.access_token}`
+                              },
+                              body: JSON.stringify({ updates: updatedSeriesMap })
+                            });
+                            if (!res.ok) throw new Error('Failed to update series');
+                            const data = await res.json();
+                            const updatedSeries = data.series || [];
+                            setSeriesOptions(updatedSeries);
+                            setOriginalSeriesOptions(updatedSeries);
+                            setShowSeriesManager(false);
+                            alert('✅ Series changes saved and synced!');
+                          } catch (err) {
+                            console.error('Series update failed:', err);
+                            alert('❌ Series update failed. Check console.');
+                          }
                         }}
                         style={{
                           backgroundColor: '#2d2d2d',
