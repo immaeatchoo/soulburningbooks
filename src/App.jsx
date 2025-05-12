@@ -1295,6 +1295,7 @@ const deleteBook = (id) => {
                             const updatedSeries = data.series || [];
                             setSeriesOptions(updatedSeries);
                             setOriginalSeriesOptions(updatedSeries);
+                            await fetchBooks();  // re-fetch the entire book list from the backend
                             setShowSeriesManager(false);
                             alert('✅ Series changes saved and synced!');
                           } catch (err) {

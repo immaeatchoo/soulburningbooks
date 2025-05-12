@@ -204,11 +204,9 @@ function AddBook({
                   className="form-control"
                   title="Choose your poison... or start a new one"
                 >
-                  {seriesOptions.map((option, index) => (
-                      <option key={index} value={option}>
-                        {option}
-                      </option>
-                    ))}
+                  {[...seriesOptions].sort().map((series, i) => (
+  <option key={i} value={series}>{series}</option>
+))}
                   {/* Option to add a new series if you like making things complicated. */}
                   <option value="__new">➕ Add New Series...</option>
                 </select>
