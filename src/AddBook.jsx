@@ -103,7 +103,7 @@ function AddBook({
   if (!showModal) return null;
 
   {/* The backdrop is just a fancy way to let you click outside to close the modal. */}
-// This is the big ugly modal overlay. Click outside the modal to close it, unless you have commitment issues.
+// This is the big ugly modal overlay. Click outside the modal to close it, unless you have commitment issues. :)
   return (
     <div className="modal-overlay">
       {/* The backdrop is just a fancy way to let you click outside to close the modal. */}
