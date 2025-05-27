@@ -9,6 +9,8 @@
     justify-content: center;
     align-items: center;
     z-index: 999;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 /* full-screen wrapper for centering the modal and catching background clicks */
@@ -24,9 +26,9 @@
 .login-modal-content {
     background: rgba(0, 0, 0, 0.85); /* Slightly darker background for the modal */
     font-family: 'CormorantUpright', serif;
-    border: 2px solid #663399;
-    border-radius: 12px;
-    padding: 2rem;
+    border: 2px solid rgba(186, 120, 255, 0.4);
+    border-radius: 15px;
+    padding: 2rem 2rem 2.5rem 2rem;
     /* responsive width and height constraints */
     width: 90%;
     max-width: 600px;
@@ -34,7 +36,7 @@
     max-height: 80vh;
     color: #eee;
     text-shadow: 1px 1px 2px black;
-    box-shadow: 0 0 60px #663399aa;
+    box-shadow: 0 0 25px #7a3fc2, 0 0 50px #663399aa;
     position: relative;
     z-index: 10;
     display: flex;
@@ -42,6 +44,7 @@
     align-items: stretch;
     text-align: center;
     overflow-y: auto; /* Allow scrolling if content overflows */
+    gap: 1rem;
 }
 
 .login-modal-content * {
@@ -69,31 +72,41 @@
     font-size: 1rem;
 }
 
+.login-modal-content input:focus {
+    outline: none;
+    border: 1px solid #b083f2;
+    box-shadow: 0 0 10px #b083f2;
+    background-color: #1f1f1f;
+}
+
 .login-modal-content button {
     margin-top: 1rem;
     width: 100%;
     padding: 0.6rem;
-    background: #663399;
+    background: linear-gradient(135deg, #7a3fc2, #b083f2);
     color: white;
     border: none;
     border-radius: 6px;
     cursor: pointer;
     font-weight: bold;
+    transition: all 0.3s ease;
 }
 
 .login-modal-content button:hover {
-    background: #7a3fc2;
+    transform: scale(1.02);
+    background: linear-gradient(135deg, #b083f2, #7a3fc2);
 }
 
 .login-close-btn {
     position: absolute;
-    top: 8px;
+    top: 10px;
     right: 12px;
     font-size: 1.5rem;
     background: transparent;
     color: #fff;
     border: none;
     cursor: pointer;
+    z-index: 20;
 }
 
 .login-error-msg {
